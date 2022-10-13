@@ -1,0 +1,22 @@
+# Task Manager (tm)
+
+# User running the daemon
+DAEMON_USER=
+DAEMON_GROUP=
+
+# Directory containing tasks and jobs
+# APP_STORAGE_PATH=/var/lib/tm
+
+# Custom title of the application
+# APP_TITLE=
+
+# Custom http port
+# APP_PORT=18080
+
+# Log level = debug, info, warning, error, critical
+# APP_LOG_LEVEL=warning
+
+# Signal number to send when trying to stop a task
+# See /usr/include/x86_64-linux-gnu/bits/signum-generic.h
+# Default value is 15 (SIGTERM)
+# APP_KILL_SIGNAL=15

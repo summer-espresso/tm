@@ -1,0 +1,12 @@
+Source: tm
+Section: web
+Priority: extra
+Maintainer: Summer Espresso <summer-espresso@dev.null>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.7.2
+
+Package: tm
+Architecture: any
+Section: web
+Depends: ${shlibs:Depends}, colorized-logs
+Description: Task Manager

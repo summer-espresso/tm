@@ -1,0 +1,4 @@
+/etc/tm
+/usr/share/tm/web
+/var/lib/tm/jobs
+/var/lib/tm/tasks

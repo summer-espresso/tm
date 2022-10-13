@@ -65,7 +65,17 @@ After the changes, it is necessary to restart the service with `/etc/init.d/tm r
 
 ## The web application
 
-The application is availaible at http://localhost:18080/web/
+The application is available at http://localhost:18080/web/
+
+## Add scripts
+
+You can add your scripts inside `/var/lib/tm/tasks` :
+* A task is a folder that contains a script called `run.sh`
+* The name of the task is the folder's name
+
+## Some examples
+
+You can copy the [Example](./doc/Example) directory inside `/var/lib/tm/tasks` and refresh your web page
 
 ## API
 
@@ -79,6 +89,3 @@ curl http://localhost:18080/api/task/by_path/%2FExample%2FGet%20some%20informati
 
 [documentation here](./doc/Build.md)
 
-## Some examples
-
-You can copy the [Example](./doc/Example) directory inside `/var/lib/tm` and refresh your web page

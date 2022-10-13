@@ -198,13 +198,13 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 			if (file_type == file_type_t::FOLDER)
 			{
 				dir_path["type"] = "folder";
-                dir_list.push_back(dir_path);
+				dir_list.push_back(dir_path);
 			}
 			if (file_type == file_type_t::TASK)
 			{
 				dir_path["type"] = "task";
 				dir_path["status"] = load_json(glo::default_jobs + storage_path + "/" + dirname + STATUS_FILENAME);
-                task_list.push_back(dir_path);
+				task_list.push_back(dir_path);
 			}
 		}
 		

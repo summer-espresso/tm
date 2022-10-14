@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/SimpleTaskManager/community](https://badges.gitter.im/SimpleTaskManager/community.svg)](https://gitter.im/SimpleTaskManager/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-tm is a simple task manager. It's a rewrite of [workr](https://github.com/sirikon/workr) with c++ in backend and vuejs 2 in frontend and with some [differencies](./doc/Workr.md).
+tm is a simple task manager. It's a rewrite of [Workr](https://github.com/sirikon/workr) with C++ in backend and VueJS 2 in frontend and with some [differencies](./doc/Workr.md).
 
 Don't expect extensive maintenance on this project as it meets almost all my needs (an open source project does not mean [free work](https://raccoon.onyxbits.de/blog/bugreport-free-support/) or [open governance](https://words.werd.io/open-source-does-not-mean-open-governance-8ab751136106)).
 
@@ -23,7 +23,7 @@ Tasks are just runnable scripts in plain text.
 
 ## Installation
 
-Download the package corresponding to your distribution. If your distribution is not derived from debian or devuan then you will probably have to rebuild the project from source.
+Download the package corresponding to your distribution. If your distribution is not derived from debian or devuan then you will probably have to rebuild the project [from source](./doc/Build.md).
 
 It is recommended to use `gdebi` if you are installing `tm` for the first time to automatically install the dependencies.
 
@@ -35,7 +35,7 @@ gdebi tm_0.1.0-1_amd64.deb
 
 ## Configuration
 
-The service starts as root by default. It is recommended to change it.
+The service starts as root by default. It is recommended to change the user.
 The configuration file is located at `/etc/default/tm`.
 
 ```sh
@@ -61,9 +61,9 @@ DAEMON_GROUP=
 # APP_KILL_SIGNAL=15
 ```
 
-If you change the user yous should also change the owner of the storage directory (`/var/lib/tm` by default).
+If you change the user you should also change the owner of the storage directory (and the subdirectories) which is `/var/lib/tm` by default.
 
-After the changes, it is necessary to restart the service with `/etc/init.d/tm restart`
+After the changes, it is must restart the service with `/etc/init.d/tm restart`
 
 ## The web application
 

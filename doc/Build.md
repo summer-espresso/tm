@@ -2,7 +2,7 @@
 
 ## Frontend
 
-You must have nodejs installed. Le frontend doit être construit avant le backend.
+You must have nodejs installed. The frontend must be built before the backend.
 
 ```sh
 cd frontend

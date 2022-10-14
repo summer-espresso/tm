@@ -1,5 +1,7 @@
 # tm
 
+[![Join the chat at https://gitter.im/SimpleTaskManager/community](https://badges.gitter.im/SimpleTaskManager/community.svg)](https://gitter.im/SimpleTaskManager/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 tm is a simple task manager. It's a rewrite of [workr](https://github.com/sirikon/workr) with c++ in backend and vuejs 2 in frontend and with some [differencies](./doc/Workr.md).
 
 Don't expect extensive maintenance on this project as it meets almost all my needs (an open source project does not mean [free work](https://raccoon.onyxbits.de/blog/bugreport-free-support/) or [open governance](https://words.werd.io/open-source-does-not-mean-open-governance-8ab751136106)).

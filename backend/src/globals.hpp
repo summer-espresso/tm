@@ -18,6 +18,7 @@ extern std::string default_jobs;
 extern const size_t PREFIX_LEN;
 extern const char * PREFIX_CLIENT_CLOSE;
 extern const char * PREFIX_SUBSCRIBE;
+extern const char * PREFIX_UNSUBSCRIBE;
 
 }; // glo
 

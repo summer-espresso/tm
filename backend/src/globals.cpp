@@ -19,6 +19,7 @@ std::string default_jobs;
 const size_t PREFIX_LEN      		= 12;
 const char * PREFIX_CLIENT_CLOSE    = "client:close";
 const char * PREFIX_SUBSCRIBE       = "subscribe  :";
+const char * PREFIX_UNSUBSCRIBE     = "unsubscribe:";
 
 } // glo
 

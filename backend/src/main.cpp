@@ -58,7 +58,6 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 	auto cpt = task_manager->get_cpt(task_path);
 	if (log_cache && mtx && cov && cpt)
 	{
-// 		int current_run = map_ws_current_task[conn];
 		int last_pos = 0;
 		int max_pos = log_cache->size();
 		std::string text;
@@ -78,7 +77,10 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 
 			if (map_active_ws.find(conn) != map_active_ws.end())
 			{
-				conn->send_text(text);
+				if (map_ws[task_path].find(conn) != map_ws[task_path].end())
+				{
+					conn->send_text(text);
+				}
 			}
 			else
 			{
@@ -120,11 +122,15 @@ void client_manager(task_manager_t * task_manager, crow::websocket::connection *
 				do_stop = true;
 				break;
 			}
-			if (prefix == glo::PREFIX_SUBSCRIBE)
+			else if (prefix == glo::PREFIX_SUBSCRIBE)
 			{
 				std::thread th = std::thread(send_output_stream, task_manager, conn, data);
 				map_ws_current_task[conn] = th.native_handle();
 				th.detach();
+			}
+			else if (prefix == glo::PREFIX_UNSUBSCRIBE)
+			{
+				map_ws_current_task.erase(conn);
 			}
 		}
 	}
@@ -385,11 +391,21 @@ int main(int argc, char* argv[])
 			if (msg["type"].asString() == "subscribe")
 			{
 				const std::string task_path = msg["task"].asString().c_str();
-				const std::string msg = "subscribe  :" + task_path;
+				const std::string msg = glo::PREFIX_SUBSCRIBE + task_path;
 				map_ws[task_path][&conn] = 1;
 				if (write(map_active_ws[&conn], msg.c_str(), msg.size()) < 0)
 				{
 					CROW_LOG_ERROR << "error (internal) send subscribe message";
+				}
+			}
+			else if (msg["type"].asString() == "unsubscribe")
+			{
+				const std::string task_path = msg["task"].asString().c_str();
+				const std::string msg = glo::PREFIX_UNSUBSCRIBE + task_path;
+				map_ws[task_path].erase(&conn);
+				if (write(map_active_ws[&conn], msg.c_str(), msg.size()) < 0)
+				{
+					CROW_LOG_ERROR << "error (internal) send unsubscribe message";
 				}
 			}
 		}

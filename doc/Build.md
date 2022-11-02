@@ -22,6 +22,7 @@ apt-get install libasio-dev libcurl4-gnutls-dev libjsoncpp-dev libprocps-dev col
 Download crow :
 
 ```sh
+mkdir backend/lib
 cd backend/lib
 git clone https://github.com/CrowCpp/Crow.git
 ```

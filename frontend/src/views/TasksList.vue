@@ -134,7 +134,9 @@ export default {
 		const data = {
 			type: "unsubscribe",
 		};
-		this.$store.state.ws.send(JSON.stringify(data));
+		if (this.$store.state.ws !== null) {
+			this.$store.state.ws.send(JSON.stringify(data));
+		}
 		this.$store.state.current_view = "TaskList";
 	},
 	mounted() {

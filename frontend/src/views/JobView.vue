@@ -35,10 +35,8 @@
 				</h3>
 				<v-col>
 					<h3 class="section_title">Execution</h3>
-					<div class="console_output" id="job_execution_output">
-						<div v-if="html_content !== ''" v-html="html_content"></div>
-						<pre v-if="output !== ''">{{ output }}</pre>
-					</div>
+					<div class="console_output" v-if="html_content !== ''" v-html="html_content"></div>
+					<div class="console_output" v-if="html_content === ''" id="job_execution_output"></div>
 					<div>
 						<span
 							id="job_execution_finished"
@@ -61,7 +59,6 @@ export default {
 	data() {
 		return {
 			job_execution: true,
-			output: "",
 			html_content: "",
 			current_task: "",
 			current_job: "",
@@ -142,7 +139,6 @@ export default {
 				}/log`
 			);
 			const json = await res.json();
-			this.output = json.content;
 			this.html_content = json.html;
 		},
 		async fetch_output_stream() {
@@ -163,9 +159,15 @@ export default {
 			});
 		},
 		job_data(data) {
-			// TODO: This is very inefficient. See :
 			// https://github.com/sirikon/workr/blob/master/src/web/assets/job_execution.js
-			this.output += data;
+			const output_el = document.getElementById('job_execution_output');
+			if (output_el !== null) {
+				const line_el_base = document.createElement('pre');
+				const output_last_line_el = line_el_base.cloneNode();
+				output_last_line_el.textContent += data
+				output_el.appendChild(output_last_line_el);
+			}
+
 			if (this.keep_body_on_bottom) {
 				document.documentElement.scrollTop = document.body.scrollHeight;
 			}
@@ -182,8 +184,11 @@ export default {
 		EventBus.$on("job:start", this.job_clear);
 	},
 	async activated() {
+		const output_el = document.getElementById('job_execution_output');
+		if (output_el !== null) {
+			output_el.innerHTML = '';
+		}
 		this.$store.state.current_view = "JobView";
-		this.output = "";
 		this.html_content = "";
 		this.current_task = this.$route.params.path;
 		this.current_job = this.$route.params.job;

@@ -60,9 +60,9 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 			}
 			exit_code = WEXITSTATUS(pclose(fp));
 			std::unique_lock<std::mutex> lck(*mtx.get());
-			(*cpt) = -1;
+			(*cpt) = STOP_THREAD;
 			cov->notify_all();
-			clear_all(task_path);
+// 			clear_all(task_path);
 		}
 		else
 		{

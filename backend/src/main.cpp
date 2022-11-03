@@ -62,7 +62,7 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 		int max_pos = log_cache->size();
 		std::string text;
 
-		while (*cpt > -1)
+		while (*cpt > STOP_THREAD)
 		{
 			if (tid != map_ws_current_task[conn])
 			{
@@ -81,6 +81,11 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 				{
 					conn->send_text(text);
 				}
+
+				if ((*cpt) == STOP_THREAD)
+				{
+					return;
+				}
 			}
 			else
 			{
@@ -95,7 +100,7 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 			}
 			last_pos = max_pos;
 			std::unique_lock<std::mutex> lck(*mtx.get());
-			if (*cpt > -1)
+			if (*cpt > STOP_THREAD)
 			{
 				cov->wait(lck);
 				max_pos = *cpt;

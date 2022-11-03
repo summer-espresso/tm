@@ -10,4 +10,4 @@
 | automatic status refresh        | yes                 | no                  |
 | can try to kill a task          | yes                 | no                  |
 | can group tasks into subfolders | yes                 | no                  |
-| can handle big log              | no                  | yes                 |
+| can handle largeog              | yes                 | yes                 |

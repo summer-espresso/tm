@@ -113,8 +113,10 @@ void task_manager_t::set_log(const std::string task_path, std::shared_ptr<vec_st
 	map_cov[task_path] = cv;
 	auto mtx = std::make_shared<std::mutex>();
 	map_mtx[task_path] = mtx;
-	auto cpt = std::make_shared<int>();
+	auto cpt = std::make_shared<int>(0);
 	map_cpt[task_path] = cpt;
+	auto stk = std::make_shared<bool>(false);
+	map_stk[task_path] = stk;
 }
 
 const std::shared_ptr<int> task_manager_t::get_cpt(const std::string task_path)
@@ -135,6 +137,12 @@ const std::shared_ptr<std::condition_variable> task_manager_t::get_cov(const std
 	return map_cov.find(task_path) != map_cov.end() ? map_cov[task_path] : nullptr;
 }
 
+const std::shared_ptr<bool> task_manager_t::get_stk(const std::string task_path)
+{
+	const std::lock_guard<std::mutex> lock(tm_mutex);
+	return map_stk.find(task_path) != map_stk.end() ? map_stk[task_path] : nullptr;
+}
+
 const std::shared_ptr<std::mutex> task_manager_t::get_mtx(const std::string task_path)
 {
 	const std::lock_guard<std::mutex> lock(tm_mutex);
@@ -147,6 +155,7 @@ void task_manager_t::del_log(const std::string task_path)
 	map_cpt.erase(task_path);
 	map_ptr.erase(task_path);
 	map_cov.erase(task_path);
+	map_stk.erase(task_path);
 	map_mtx.erase(task_path);
 }
 

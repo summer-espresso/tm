@@ -4,7 +4,7 @@
 			<v-list-item>
 				<v-list-item-content>
 					<v-list-item-title class="text-h6"> Task Manager </v-list-item-title>
-					<v-list-item-subtitle> 0.2.0 </v-list-item-subtitle>
+					<v-list-item-subtitle> 0.2.1 </v-list-item-subtitle>
 				</v-list-item-content>
 			</v-list-item>
 
@@ -66,6 +66,8 @@ export default {
 
 			this.$store.state.ws.onerror = () => {
 				// console.log("ws error");
+				this.$store.state.ws_is_running = false;
+				this.$store.state.ws_is_starting = false;
 			};
 
 			this.$store.state.ws.onclose = () => {

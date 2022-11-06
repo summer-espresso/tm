@@ -147,7 +147,9 @@ export default {
 				type: "subscribe",
 				task: task_path,
 			};
-			this.$store.state.ws.send(JSON.stringify(data));
+			if (this.$store.state.ws !== null && this.$store.state.ws_is_running) {
+				this.$store.state.ws.send(JSON.stringify(data));
+			}
 		},
 		job_stop() {
 			this.is_running = false;

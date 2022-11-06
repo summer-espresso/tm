@@ -184,7 +184,9 @@ export default {
 		const data = {
 			type: "unsubscribe",
 		};
-		this.$store.state.ws.send(JSON.stringify(data));
+		if (this.$store.state.ws !== null && this.$store.state.ws_is_running) {
+			this.$store.state.ws.send(JSON.stringify(data));
+		}
 		const task_path = encodeURIComponent(this.$route.params.path);
 		this.links = [
 			{

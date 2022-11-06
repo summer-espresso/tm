@@ -16,6 +16,7 @@ using map_int_t = std::map<std::string, std::shared_ptr<int>>;
 using map_cov_t = std::map<std::string, std::shared_ptr<std::condition_variable>>;
 using map_mtx_t = std::map<std::string, std::shared_ptr<std::mutex>>;
 using map_pid_t = std::map<std::string, vec_pid_t>;
+using map_stk_t = std::map<std::string, std::shared_ptr<bool>>;
 
 using task_list_t = std::map<std::string, Json::Value>;
 
@@ -29,6 +30,7 @@ private:
     map_cov_t   map_cov;
     map_mtx_t   map_mtx;
     map_pid_t   map_pid;
+    map_stk_t   map_stk;
 
 public:
     int         start       (const std::string & task_path);
@@ -42,6 +44,7 @@ public:
     const   std::shared_ptr<vec_str_t>                  get_log (const std::string task_path);
     const   std::shared_ptr<std::mutex>                 get_mtx (const std::string task_path);
     const   std::shared_ptr<std::condition_variable>    get_cov (const std::string task_path);
+    const   std::shared_ptr<bool>    					get_stk (const std::string task_path);
 };
 
 #endif // TASK_MANAGER_HPP

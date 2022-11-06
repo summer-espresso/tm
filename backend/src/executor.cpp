@@ -41,6 +41,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 			auto mtx = task_manager->get_mtx(task_path);
 			auto cov = task_manager->get_cov(task_path);
 			auto cpt = task_manager->get_cpt(task_path);
+			auto stk = task_manager->get_stk(task_path);
 
 			std::string text;
 
@@ -60,9 +61,9 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 			}
 			exit_code = WEXITSTATUS(pclose(fp));
 			std::unique_lock<std::mutex> lck(*mtx.get());
-			(*cpt) = STOP_THREAD;
+			// Stop Token
+			*stk = true;
 			cov->notify_all();
-// 			clear_all(task_path);
 		}
 		else
 		{

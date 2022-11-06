@@ -134,7 +134,7 @@ export default {
 		const data = {
 			type: "unsubscribe",
 		};
-		if (this.$store.state.ws !== null) {
+		if (this.$store.state.ws !== null && this.$store.state.ws_is_running) {
 			this.$store.state.ws.send(JSON.stringify(data));
 		}
 		this.$store.state.current_view = "TaskList";

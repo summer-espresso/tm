@@ -1,6 +1,6 @@
 # Differences with Workr
 
-|                                 | tm                  | workr               |
+|                                 | tm (0.2.1)          | workr (0.3.4)       |
 |---------------------------------|---------------------|---------------------|
 | authentication                  | no                  | yes                 |
 | tasks folder                    | `/var/lib/tm/tasks` | `./jobs`            |
@@ -10,4 +10,4 @@
 | automatic status refresh        | yes                 | no                  |
 | can try to kill a task          | yes                 | no                  |
 | can group tasks into subfolders | yes                 | no                  |
-| can handle largeog              | yes                 | yes                 |
+| can handle large log            | yes                 | yes                 |

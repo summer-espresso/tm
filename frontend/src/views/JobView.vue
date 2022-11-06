@@ -216,6 +216,7 @@ export default {
 	padding: 20px;
 	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.29);
 	border-radius: 3px;
+	overflow-x: auto;
 }
 
 .console_output pre {

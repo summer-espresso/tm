@@ -1,3 +1,9 @@
+tm (0.2.2-1) stable; urgency=medium
+
+  * Improve display log response
+
+ -- Summer Espresso <summer-espresso@dev.null>  Sun, 06 Nov 2022 12:16:25 +0100
+
 tm (0.2.1-1) stable; urgency=medium
 
   * Fix front use null ws

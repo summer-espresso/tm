@@ -181,28 +181,30 @@ export default {
 		},
 	},
 	activated() {
-		const data = {
-			type: "unsubscribe",
-		};
 		if (this.$store.state.ws !== null && this.$store.state.ws_is_running) {
-			this.$store.state.ws.send(JSON.stringify(data));
+			this.$store.state.ws.send(
+				JSON.stringify({
+					type: "unsubscribe",
+				})
+			);
 		}
 		const task_path = encodeURIComponent(this.$route.params.path);
+		const api_url = this.make_api_url();
 		this.links = [
 			{
 				icon: "mdi-play",
 				title: "Execute task",
-				link: `${this.make_api_url()}/task/by_path/${task_path}/execute`,
+				link: `${api_url}/task/by_path/${task_path}/execute`,
 			},
 			{
 				icon: "mdi-stop",
 				title: "Stop task",
-				link: `${this.make_api_url()}/task/by_path/${task_path}/stop`,
+				link: `${api_url}/task/by_path/${task_path}/stop`,
 			},
 			{
 				icon: "mdi-check",
 				title: "Status task",
-				link: `${this.make_api_url()}/task/by_path/${task_path}/status`,
+				link: `${api_url}/task/by_path/${task_path}/status`,
 			},
 		];
 		this.$store.state.current_view = "TaskView";

@@ -146,6 +146,22 @@ void clear_all(const std::string & task_path)
 	map_ws.erase(task_path);
 }
 
+std::string get_job_log(Json::Value & log, const std::string & task_path, const int & job_number)
+{
+	std::string log_file = glo::default_jobs + task_path + "/" + std::to_string(job_number) + "/output.log";
+	if (file_exists(log_file + ".html"))
+	{
+		log["html"] = load_content(log_file + ".html");
+	}
+	else
+	{
+		log["content"] = load_content(log_file);
+	}
+	std::ostringstream os;
+	os << log;
+	return os.str();
+}
+
 int main(int argc, char* argv[])
 {
 	char list_opt[] = "p:s:t:k:l:";
@@ -310,6 +326,19 @@ int main(int argc, char* argv[])
 		return load_content(glo::default_jobs + task_path + "/" + std::to_string(job_number) + STATUS_FILENAME);
 	});
 
+	CROW_ROUTE(app, "/api/task/by_path/<string>/job/<int>/status_log")
+	([](const std::string & task_path_encoded, const int & job_number)
+	{
+		std::string response;
+		std::string task_path = decode_url(task_path_encoded);
+		Json::Value log = load_json(glo::default_jobs + task_path + "/" + std::to_string(job_number) + STATUS_FILENAME);
+		if (!task_path.empty() && (task_path[0] == '/'))
+		{
+			response = get_job_log(log, task_path, job_number);
+		}
+		return response;
+	});
+
 	CROW_ROUTE(app, "/api/task/by_path/<string>/job/<int>/log")
 	([](const std::string & task_path_encoded, const int & job_number)
 	{
@@ -318,18 +347,7 @@ int main(int argc, char* argv[])
 		if (!task_path.empty() && (task_path[0] == '/'))
 		{
 			Json::Value log;
-			std::string log_file = glo::default_jobs + task_path + "/" + std::to_string(job_number) + "/output.log";
-			if (file_exists(log_file + ".html"))
-			{
-				log["html"] = load_content(log_file + ".html");
-			}
-			else
-			{
-				log["content"] = load_content(log_file);
-			}
-			std::ostringstream os;
-			os << log;
-			response = os.str();
+			response = get_job_log(log, task_path, job_number);
 		}
 		return response;
 	});

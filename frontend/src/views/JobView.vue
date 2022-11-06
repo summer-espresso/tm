@@ -113,7 +113,7 @@ export default {
 				const res = await fetch(
 					`${this.make_api_url()}/task/by_path/${task_path}/job/${
 						this.current_job
-					}/status`
+					}/status_log`
 				);
 				const status = await res.json();
 				this.status = status;
@@ -122,6 +122,11 @@ export default {
 						this.is_running = true;
 					} else {
 						this.is_running = false;
+					}
+					if (status.html !== undefined && status.html !== '') {
+						this.html_content = status.html;
+					} else if (status.content !== undefined && status.content !== '') {
+						//
 					}
 				} else {
 					this.is_running = false;
@@ -198,7 +203,7 @@ export default {
 		if (this.is_running) {
 			this.fetch_output_stream();
 		} else {
-			this.fetch_log();
+			// this.fetch_log();
 		}
 	},
 };

@@ -81,10 +81,25 @@ You can copy the [Example](./doc/Example) directory inside `/var/lib/tm/tasks` a
 
 ## API
 
-You can start a task with the given URL with the 3 vertical dots button 
+You can start a task with the given URL with the 3 vertical dots button
 
 ```sh
 curl http://localhost:18080/api/task/by_path/%2FExample%2FGet%20some%20informations/execute
+```
+
+## Task configuration
+
+The configuration is the `task.json` file next to the `run.sh` file.
+
+* max_log_jobs
+
+Indicates the maximum number of logs to keep. The oldest logs will be purged at the end of each task execution.
+The `-1` value (default) disable the automatic purge.
+
+```json
+{
+  "max_log_jobs": 4
+}
 ```
 
 ## Build from source

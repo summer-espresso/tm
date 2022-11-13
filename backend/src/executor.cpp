@@ -6,6 +6,7 @@
 #include <crow/logging.h>
 #include <json/json.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -16,6 +17,48 @@ void send_all(const std::string &, const char *);
 void clear_all(const std::string &);
 void broadcast_all(const char * buf);
 
+void purge_log(const std::string log_base, int max_log_jobs)
+{
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(log_base.c_str())) != NULL)
+	{
+		std::vector<int> element_list;
+
+		while ((ent = readdir(dir)) != NULL)
+		{
+			if (ent->d_type == DT_DIR)
+			{
+				std::string dirname = ent->d_name;
+				if ((dirname != ".") && (dirname != ".."))
+				{
+					element_list.push_back(atoi(dirname.c_str()));
+				}
+			}
+		}
+
+		std::sort(element_list.rbegin(), element_list.rend());
+
+		std::string log_path;
+		for (int num : element_list)
+		{
+			if (max_log_jobs > 0)
+			{
+				max_log_jobs--;
+				continue;
+			}
+			log_path = log_base + std::to_string(num);
+			const std::string cmd = "rm -fR " + escape_filename(log_path);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+			(void) system(cmd.c_str());
+#pragma GCC diagnostic pop
+		}
+
+		closedir(dir);
+	}
+}
+
 const std::string execute_task(task_manager_t * task_manager, const std::string & task_path, int job_number)
 {
 	std::string result;
@@ -23,8 +66,22 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 	const int BUF_SIZE = 1024;
 	static thread_local char buf[BUF_SIZE];
 	FILE *fp = nullptr;
-	const std::string cmd_path = escape_filename(glo::default_tasks + task_path + "/run.sh") + " 2>&1";
-	const std::string log_path = glo::default_jobs + task_path + "/" + std::to_string(job_number) + "/output.log";
+	const std::string base_path = glo::default_tasks + task_path;
+	const std::string cmd_path = escape_filename(base_path) + "/run.sh 2>&1";
+	const std::string conf_path = base_path + "/task.json";
+	const std::string log_base = glo::default_jobs + task_path + "/";
+	const std::string log_path = log_base + std::to_string(job_number) + "/output.log";
+
+	int max_log_jobs = -1;
+
+	if (file_exists(conf_path))
+	{
+		Json::Value conf = load_json(conf_path);
+		if (conf.isMember("max_log_jobs") && conf["max_log_jobs"].isInt())
+		{
+			max_log_jobs = conf["max_log_jobs"].asInt();
+		}
+	}
 
 	auto log_cache = std::make_shared<vec_str_t>();
 	task_manager->set_log(task_path, log_cache);
@@ -78,6 +135,11 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 		if (res != 0)
 		{
 			CROW_LOG_WARNING << "unable to execute ansi2html exit code " << res;
+		}
+
+		if (max_log_jobs > -1)
+		{
+			purge_log(log_base, max_log_jobs);
 		}
 	}
 	else

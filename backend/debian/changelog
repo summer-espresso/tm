@@ -1,3 +1,9 @@
+tm (0.3.0-1) stable; urgency=low
+
+  * Add max_log_jobs
+
+ -- Summer Espresso <summer-espresso@dev.null>  Sun, 13 Nov 2022 01:32:57 +0100
+
 tm (0.2.2-1) stable; urgency=medium
 
   * Improve display log response

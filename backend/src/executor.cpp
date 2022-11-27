@@ -14,7 +14,6 @@
 #include <stdio.h>
 
 void send_all(const std::string &, const char *);
-void clear_all(const std::string &);
 void broadcast_all(const char * buf);
 
 void purge_log(const std::string log_base, int max_log_jobs)
@@ -83,10 +82,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 		}
 	}
 
-	auto log_cache = std::make_shared<vec_str_t>();
-	task_manager->set_log(task_path, log_cache);
-
-	int position = 0;
+	auto log_cache = task_manager->set_log(task_path);
 
 	std::ofstream ofs(log_path);
 	if (ofs.is_open())
@@ -98,9 +94,6 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 			auto mtx = task_manager->get_mtx(task_path);
 			auto cov = task_manager->get_cov(task_path);
 			auto cpt = task_manager->get_cpt(task_path);
-			auto stk = task_manager->get_stk(task_path);
-
-			std::string text;
 
 			while (fgets(buf, BUF_SIZE, fp) != nullptr)
 			{
@@ -108,27 +101,20 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 				ofs << buf << std::flush;
 				// memory
 				log_cache->push_back(buf);
-				// stdout
-				position++;
 				std::unique_lock<std::mutex> lck(*mtx.get());
 				(*cpt)++;
 				cov->notify_all();
-				text = "data:";
-				text += buf;
 			}
 			exit_code = WEXITSTATUS(pclose(fp));
 			std::unique_lock<std::mutex> lck(*mtx.get());
-			// Stop Token
-			*stk = true;
+			(*cpt) = -1;
 			cov->notify_all();
 		}
 		else
 		{
 			exit_code = errno;
-			clear_all(task_path);
 		}
 		ofs.close();
-		broadcast_all("stop:");
 
 		const std::string cmd = "ansi2html -n < " + escape_filename(log_path) + " > " + escape_filename(log_path + ".html");
 		int res = system(cmd.c_str());
@@ -150,6 +136,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 
 	task_manager->del_log(task_path);
 	task_manager->signal_end(task_path, exit_code);
+	broadcast_all("stop:");
 
 	return result;
 }

@@ -52,13 +52,13 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 	{
 		return;
 	}
+
 	auto log_cache = task_manager->get_log(task_path);
 	auto mtx = task_manager->get_mtx(task_path);
 	auto cov = task_manager->get_cov(task_path);
 	auto cpt = task_manager->get_cpt(task_path);
-	auto stk = task_manager->get_stk(task_path);
 
-	if (log_cache && mtx && cov && cpt && stk)
+	if (log_cache && mtx && cov && cpt)
 	{
 		int last_pos = 0;
 		int max_pos = log_cache->size();
@@ -91,16 +91,6 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 				return;
 			}
 
-			if (*stk)
-			{
-				// Stop Token
-				return;
-			}
-
-			if (tid != map_ws_current_task[conn])
-			{
-				return;
-			}
 			last_pos = max_pos;
 			std::unique_lock<std::mutex> lck(*mtx.get());
 			cov->wait(lck);
@@ -139,11 +129,6 @@ void client_manager(task_manager_t * task_manager, crow::websocket::connection *
 			}
 		}
 	}
-}
-
-void clear_all(const std::string & task_path)
-{
-	map_ws.erase(task_path);
 }
 
 std::string get_job_log(Json::Value & log, const std::string & task_path, const int & job_number)

@@ -187,13 +187,14 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 
 		vec_json_t dir_list;
 		vec_json_t task_list;
-        
+
 		for (std::string & dirname : element_list)
 		{
 			Json::Value dir_path;
 			dir_path["status"];
 			dir_path["parent"] = parent.empty() ? "/" : parent;
 			dir_path["name"] = dirname;
+			dir_path["id"]  = (parent.empty() ? "/" : parent) + "/" + dirname;
 			file_type_t file_type = load_tasks(dir_path["children"], storage_path + "/" + dirname, parent + "/" + dirname);
 			if (file_type == file_type_t::FOLDER)
 			{
@@ -207,17 +208,17 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 				task_list.push_back(dir_path);
 			}
 		}
-		
+
 		for (Json::Value & elt : dir_list)
 		{
 			node.append(elt);
 		}
-        
+
 		for (Json::Value & elt : task_list)
 		{
 			node.append(elt);
 		}
-        
+
 		closedir(dir);
 	}
 

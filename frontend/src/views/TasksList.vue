@@ -24,7 +24,6 @@
 				:open="initiallyOpen"
 				:items="task_list"
 				activatable
-				item-key="name + file"
 				open-on-click
 				style="width: 100%"
 			>

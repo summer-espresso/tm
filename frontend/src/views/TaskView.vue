@@ -164,7 +164,10 @@ export default {
 		async execute_task() {
 			const task_path = encodeURIComponent(this.$route.params.path);
 			const res = await fetch(
-				`${this.make_api_url()}/task/by_path/${task_path}/execute`
+				`${this.make_api_url()}/task/by_path/${task_path}/execute`,
+				{
+					cache: "no-cache",
+				}
 			);
 			const json = await res.json();
 			if (json.status === "ok") {
@@ -174,7 +177,10 @@ export default {
 		async fetch_task_jobs() {
 			const task_path = encodeURIComponent(this.$route.params.path);
 			const res = await fetch(
-				`${this.make_api_url()}/task/by_path/${task_path}/jobs`
+				`${this.make_api_url()}/task/by_path/${task_path}/jobs`,
+				{
+					cache: "no-cache",
+				}
 			);
 			const json = await res.json();
 			this.job_list = json;

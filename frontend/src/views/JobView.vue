@@ -99,7 +99,9 @@ export default {
 		},
 		async stop_task() {
 			const encoded_task = encodeURIComponent(this.$route.params.path);
-			await fetch(`${this.make_api_url()}/task/by_path/${encoded_task}/stop`);
+			await fetch(`${this.make_api_url()}/task/by_path/${encoded_task}/stop`, {
+				cache: "no-cache",
+			});
 			this.fetch_status();
 			this.is_running = false;
 		},

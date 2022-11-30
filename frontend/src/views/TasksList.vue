@@ -124,7 +124,9 @@ export default {
 			this.$router.push(`/task/${encoded_task}/view`);
 		},
 		async fetch_task_list() {
-			const res = await fetch(`${this.make_api_url()}/tasks`);
+			const res = await fetch(`${this.make_api_url()}/tasks`, {
+				cache: "no-cache",
+			});
 			const json = await res.json();
 			this.task_list = json !== null ? json : [];
 		},

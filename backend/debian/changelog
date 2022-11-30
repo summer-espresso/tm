@@ -1,8 +1,15 @@
+tm (0.3.2-1) stable; urgency=low
+
+  * Fix refresh on browser startup
+  * Crow : 4eda8bdc Merge pull request #566 from hlmodi/fix-381
+
+ -- Summer Espresso <summer-espresso@dev.null>  Wed, 30 Nov 2022 14:30:36 +0100
+
 tm (0.3.1-1) stable; urgency=medium
 
   * Fix treeview
   * Fix task termination
-  * 84ec7832 Crow: Merge pull request #560 from okaestne/fix-memleaks
+  * Crow : 84ec7832 Merge pull request #560 from okaestne/fix-memleaks
 
  -- Summer Espresso <summer-espresso@dev.null>  Sun, 27 Nov 2022 09:09:00 +0100
 

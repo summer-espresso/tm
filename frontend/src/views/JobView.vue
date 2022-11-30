@@ -35,8 +35,16 @@
 				</h3>
 				<v-col>
 					<h3 class="section_title">Execution</h3>
-					<div class="console_output" v-if="html_content !== ''" v-html="html_content"></div>
-					<div class="console_output" v-if="html_content === ''" id="job_execution_output"></div>
+					<div
+						class="console_output"
+						v-if="html_content !== ''"
+						v-html="html_content"
+					></div>
+					<div
+						class="console_output"
+						v-if="html_content === ''"
+						id="job_execution_output"
+					></div>
 					<div>
 						<span
 							id="job_execution_finished"
@@ -125,9 +133,9 @@ export default {
 					} else {
 						this.is_running = false;
 					}
-					if (status.html !== undefined && status.html !== '') {
+					if (status.html !== undefined && status.html !== "") {
 						this.html_content = status.html;
-					} else if (status.content !== undefined && status.content !== '') {
+					} else if (status.content !== undefined && status.content !== "") {
 						//
 					}
 				} else {
@@ -169,11 +177,11 @@ export default {
 		},
 		job_data(data) {
 			// https://github.com/sirikon/workr/blob/master/src/web/assets/job_execution.js
-			const output_el = document.getElementById('job_execution_output');
+			const output_el = document.getElementById("job_execution_output");
 			if (output_el !== null) {
-				const line_el_base = document.createElement('pre');
+				const line_el_base = document.createElement("pre");
 				const output_last_line_el = line_el_base.cloneNode();
-				output_last_line_el.textContent += data
+				output_last_line_el.textContent += data;
 				output_el.appendChild(output_last_line_el);
 			}
 
@@ -193,9 +201,9 @@ export default {
 		EventBus.$on("job:start", this.job_clear);
 	},
 	async activated() {
-		const output_el = document.getElementById('job_execution_output');
+		const output_el = document.getElementById("job_execution_output");
 		if (output_el !== null) {
-			output_el.innerHTML = '';
+			output_el.innerHTML = "";
 		}
 		this.$store.state.current_view = "JobView";
 		this.html_content = "";

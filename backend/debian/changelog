@@ -1,3 +1,9 @@
+tm (0.3.3-1) stable; urgency=low
+
+  * Fix task filtering during dispatch
+
+ -- Summer Espresso <summer-espresso@dev.null>  Sun, 04 Dec 2022 03:43:04 +0100
+
 tm (0.3.2-1) stable; urgency=low
 
   * Fix refresh on browser startup

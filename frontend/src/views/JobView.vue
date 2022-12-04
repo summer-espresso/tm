@@ -166,14 +166,17 @@ export default {
 				this.$store.state.ws.send(JSON.stringify(data));
 			}
 		},
-		job_stop() {
-			this.is_running = false;
-			this.fetch_status();
-			this.$nextTick(() => {
-				if (this.keep_body_on_bottom) {
-					document.documentElement.scrollTop = document.body.scrollHeight;
-				}
-			});
+		job_stop(task_path) {
+			console.log("JobView : job_stop", task_path, this.$route.params.path);
+			if (task_path === this.$route.params.path) {
+				this.is_running = false;
+				this.fetch_status();
+				this.$nextTick(() => {
+					if (this.keep_body_on_bottom) {
+						document.documentElement.scrollTop = document.body.scrollHeight;
+					}
+				});
+			}
 		},
 		job_data(data) {
 			// https://github.com/sirikon/workr/blob/master/src/web/assets/job_execution.js
@@ -189,9 +192,12 @@ export default {
 				document.documentElement.scrollTop = document.body.scrollHeight;
 			}
 		},
-		job_clear() {
-			this.output = "";
-			this.html_content = "";
+		job_clear(task_path) {
+			console.log("JobView : job_clear", task_path, this.$route.params.path);
+			if (task_path === this.$route.params.path) {
+				this.output = "";
+				this.html_content = "";
+			}
 		},
 	},
 	mounted() {

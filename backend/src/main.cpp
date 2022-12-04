@@ -290,7 +290,7 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				broadcast_all("strt:");
+				broadcast_all((std::string("strt:") + task_path).c_str());
 				response = "{ \"status\": \"ok\", \"job\": " + std::to_string(res) +  "}";
 			}
 		}

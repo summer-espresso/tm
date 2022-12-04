@@ -77,24 +77,31 @@ export default {
 			};
 
 			this.$store.state.ws.onmessage = (e) => {
+				// console.log("ws onmessage", e);
+				const PREFIX_LEN = 5;
 				const len = e.data.length;
-				if (len >= 5) {
-					const prefix = e.data.substr(0, 5);
+				if (len > PREFIX_LEN) {
+					const prefix = e.data.substr(0, PREFIX_LEN);
+					const payload = e.data.substr(PREFIX_LEN);
 					if (prefix === "data:") {
 						switch (this.$store.state.current_view) {
 							case "JobView":
-								EventBus.$emit("job:data", e.data.substr(5, len - 5));
+								// payload = data
+								EventBus.$emit("job:data", payload);
 								break;
 						}
 					}
 					if (prefix === "stop:") {
-						EventBus.$emit("job:stop");
+						// payload = task_path
+						EventBus.$emit("job:stop", payload);
 					}
 					if (prefix === "strt:") {
-						EventBus.$emit("job:start");
+						// payload = task_path
+						EventBus.$emit("job:start", payload);
 					}
 					if (prefix === "titl:") {
-						EventBus.$emit("app:title", e.data.substr(5, len - 5));
+						// payload = title
+						EventBus.$emit("app:title", payload);
 					}
 				}
 			};

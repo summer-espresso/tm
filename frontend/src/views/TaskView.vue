@@ -185,6 +185,11 @@ export default {
 			const json = await res.json();
 			this.job_list = json;
 		},
+		dispatch_job_event(task_path) {
+			if (task_path === this.$route.params.path) {
+				this.fetch_task_jobs();
+			}
+		},
 	},
 	activated() {
 		if (this.$store.state.ws !== null && this.$store.state.ws_is_running) {
@@ -217,8 +222,8 @@ export default {
 		this.fetch_task_jobs();
 	},
 	mounted() {
-		EventBus.$on("job:start", this.fetch_task_jobs);
-		EventBus.$on("job:stop", this.fetch_task_jobs);
+		EventBus.$on("job:start", this.dispatch_job_event);
+		EventBus.$on("job:stop", this.dispatch_job_event);
 	},
 };
 </script>

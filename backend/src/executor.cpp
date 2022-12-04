@@ -136,7 +136,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 
 	task_manager->del_log(task_path);
 	task_manager->signal_end(task_path, exit_code);
-	broadcast_all("stop:");
+	broadcast_all((std::string("stop:") + task_path).c_str());
 
 	return result;
 }

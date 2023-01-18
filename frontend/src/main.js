@@ -9,9 +9,10 @@ Vue.config.productionTip = false
 Vue.mixin({
 	methods: {
 		make_ws_url: function () {
+			const ws_prot = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
 			return process.env.NODE_ENV === "production" ?
-				`ws://${window.location.hostname}:${window.location.port}/ws` :
-				'ws://localhost:18080/ws';
+				`${ws_prot}//${window.location.hostname}:${window.location.port}/ws` :
+				`${ws_prot}//localhost:18080/ws`;
 		},
 		make_api_url: function () {
 			return process.env.NODE_ENV === "production" ?

@@ -304,6 +304,13 @@ std::string decode_url(const std::string & url)
 		decoded_string = decoded;
 		curl_free(decoded);
 	}
+	if (!decoded_string.empty())
+	{
+		if (decoded_string[0] != '/')
+		{
+			decoded_string = "/" + decoded_string;
+		}
+	}
 	return decoded_string;
 }
 

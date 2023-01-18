@@ -265,9 +265,9 @@ int main(int argc, char* argv[])
 	CROW_ROUTE(app, "/api/task/by_path/<string>/jobs")
 	([](const std::string & task_path_encoded)
 	{
-		std::string result = "{}";;
+		std::string result = "{}";
 		std::string task_path = decode_url(task_path_encoded);
-		if (!task_path.empty() && (task_path[0] == '/'))
+		if (!task_path.empty())
 		{
 			std::ostringstream os;
 			os << load_jobs(glo::default_jobs + task_path);
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 	{
 		std::string response = "{}";
 		std::string task_path = decode_url(task_path_encoded);
-		if (!task_path.empty() && (task_path[0] == '/'))
+		if (!task_path.empty())
 		{
 			int res = task_manager.start(task_path);
 			if (res < 0)

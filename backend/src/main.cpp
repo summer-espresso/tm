@@ -149,7 +149,7 @@ std::string get_job_log(Json::Value & log, const std::string & task_path, const 
 
 int main(int argc, char* argv[])
 {
-	char list_opt[] = "p:s:t:k:l:";
+	char list_opt[] = "b:p:s:t:k:l:";
 	int opt = 0;
 	std::string log_level;
 
@@ -157,6 +157,10 @@ int main(int argc, char* argv[])
 	{
 		switch (opt)
 		{
+		case 'b':
+			// bind address
+			glo::bindaddr = optarg;
+			break;
 		case 'k':
 			glo::kill_signal = atoi(optarg);
 			break;
@@ -277,13 +281,27 @@ int main(int argc, char* argv[])
 	});
 
 	CROW_ROUTE(app, "/api/task/by_path/<string>/execute")
-	([&task_manager](const std::string & task_path_encoded)
+	([&task_manager](const crow::request& req, const std::string & task_path_encoded)
 	{
 		std::string response = "{}";
+		std::string param_list;
 		std::string task_path = decode_url(task_path_encoded);
 		if (!task_path.empty())
 		{
-			int res = task_manager.start(task_path);
+			std::string param;
+			for (int p = 1 ; p <= 50 ; p++)
+			{
+				param = "p" + std::to_string(p);
+				if (req.url_params.get(param) != nullptr)
+				{
+					param_list += " \"" + decode_param(req.url_params.get(param)) + "\"";
+				}
+				else
+				{
+					break;
+				}
+			}
+			int res = task_manager.start(task_path, param_list);
 			if (res < 0)
 			{
 				response = "{ \"status\": \"error\", \"errnum\": " + std::to_string(-res) +  "}";
@@ -419,7 +437,16 @@ int main(int argc, char* argv[])
 		}
 	});
 
-	app.port(glo::port).multithreaded().run();
+	if (glo::bindaddr.empty())
+	{
+		glo::bindaddr = "127.0.0.1";
+	}
+
+	app
+		.bindaddr(glo::bindaddr)
+		.port(glo::port)
+		.multithreaded()
+		.run();
 
 	if (curl)
 	{

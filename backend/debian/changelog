@@ -1,3 +1,15 @@
+tm (0.3.5-1) stable; urgency=low
+
+  * Add task description (file task.json)
+  * Add support GET param :
+    The task path must url encoded into task_path parameter.
+    Others optional parameters must begin with p0 up to p49 maximum and will be
+    passed to the script in that order.
+  * BREAKING CHANGE : binding address is now 127.0.0.1 by default (not 0.0.0.0)
+    Add the APP_BIND parameter in /etc/default/tm to modify it.
+
+ -- Summer Espresso <summer-espresso@dev.null>  Thu, 09 Mar 2023 06:42:29 +0100
+
 tm (0.3.4-1) stable; urgency=low
 
   * Fix https access

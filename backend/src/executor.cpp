@@ -47,7 +47,7 @@ void purge_log(const std::string log_base, int max_log_jobs)
 				continue;
 			}
 			log_path = log_base + std::to_string(num);
-			const std::string cmd = "rm -fR " + escape_filename(log_path);
+			const std::string cmd = "rm -fR " + enquote_filename(log_path);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
 			(void) system(cmd.c_str());
@@ -58,7 +58,12 @@ void purge_log(const std::string log_base, int max_log_jobs)
 	}
 }
 
-const std::string execute_task(task_manager_t * task_manager, const std::string & task_path, int job_number)
+const std::string execute_task(
+	task_manager_t * task_manager,
+	const std::string & task_path,
+	int job_number,
+	const std::string & param_list
+)
 {
 	std::string result;
 	int exit_code = 0;
@@ -66,12 +71,19 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 	static thread_local char buf[BUF_SIZE];
 	FILE *fp = nullptr;
 	const std::string base_path = glo::default_tasks + task_path;
-	const std::string cmd_path = escape_filename(base_path) + "/run.sh 2>&1";
+	const std::string cmd_path = enquote_filename(base_path + "/run.sh");
 	const std::string conf_path = base_path + "/task.json";
 	const std::string log_base = glo::default_jobs + task_path + "/";
 	const std::string log_path = log_base + std::to_string(job_number) + "/output.log";
 
 	int max_log_jobs = -1;
+
+	if (!file_exists(base_path + "/run.sh"))
+	{
+		CROW_LOG_ERROR << "script " << cmd_path << "does not exist";
+		result = "script does not exist";
+		return result;
+	}
 
 	if (file_exists(conf_path))
 	{
@@ -87,7 +99,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 	std::ofstream ofs(log_path);
 	if (ofs.is_open())
 	{
-		if ((fp = popen(cmd_path.c_str(), "r")) != nullptr)
+		if ((fp = popen((cmd_path + " " + param_list + " 2>&1").c_str(), "r")) != nullptr)
 		{
 			task_manager->set_pid(task_path, diff_children(task_path));
 
@@ -116,7 +128,7 @@ const std::string execute_task(task_manager_t * task_manager, const std::string 
 		}
 		ofs.close();
 
-		const std::string cmd = "ansi2html -n < " + escape_filename(log_path) + " > " + escape_filename(log_path + ".html");
+		const std::string cmd = "ansi2html -n < " + enquote_filename(log_path) + " > " + enquote_filename(log_path + ".html");
 		int res = system(cmd.c_str());
 		if (res != 0)
 		{

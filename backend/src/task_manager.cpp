@@ -15,7 +15,7 @@ std::mutex tm_mutex;
 
 // https://programmer.group/c-std-condition_variable-wait-wait_for-is-different-from-how-to-use-instances.html
 
-int task_manager_t::start(const std::string & task_path)
+int task_manager_t::start(const std::string & task_path, const std::string & param_list)
 {
 	const std::lock_guard<std::mutex> lock(tm_mutex);
 	if (running_tasks.find(task_path) != running_tasks.end())
@@ -56,7 +56,7 @@ int task_manager_t::start(const std::string & task_path)
 
 	running_tasks[task_path] = task;
 
-	std::thread th = std::thread(execute_task, this, task_path, job_number);
+	std::thread th = std::thread(execute_task, this, task_path, job_number, param_list);
 	running_tasks[task_path]["thread_id"] = (Json::Value::UInt64)th.native_handle();
 	th.detach();
 

@@ -187,6 +187,7 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 
 		vec_json_t dir_list;
 		vec_json_t task_list;
+		std::string conf_path;
 
 		for (std::string & dirname : element_list)
 		{
@@ -205,6 +206,7 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 			{
 				dir_path["type"] = "task";
 				dir_path["status"] = load_json(glo::default_jobs + storage_path + "/" + dirname + STATUS_FILENAME);
+				dir_path["conf"] =  load_json(glo::default_tasks + storage_path + "/" + dirname + "/task.json");
 				task_list.push_back(dir_path);
 			}
 		}
@@ -286,13 +288,13 @@ int ensure_folder(const std::string & folder)
 {
 	if (!dir_exists(folder))
 	{
-		std::string cmd = "mkdir -p " + escape_filename(folder);
+		std::string cmd = "mkdir -p " + enquote_filename(folder);
 		return system(cmd.c_str());
 	}
 	return 0;
 }
 
-std::string decode_url(const std::string & url)
+std::string decode_param(const std::string & url)
 {
 	// https://curl.se/libcurl/c/threadsafe.html
 	const std::lock_guard<std::mutex> lock(curl_mutex);
@@ -304,6 +306,12 @@ std::string decode_url(const std::string & url)
 		decoded_string = decoded;
 		curl_free(decoded);
 	}
+	return decoded_string;
+}
+
+std::string decode_url(const std::string & url)
+{
+	std::string decoded_string = decode_param(url);
 	if (!decoded_string.empty())
 	{
 		if (decoded_string[0] != '/')
@@ -314,7 +322,7 @@ std::string decode_url(const std::string & url)
 	return decoded_string;
 }
 
-std::string escape_filename(const std::string & filename)
+std::string enquote_filename(const std::string & filename)
 {
 	std::string str = "\"";
 	str += filename;

@@ -33,7 +33,8 @@ bool            file_exists         (const std::string & filename);
 int             ensure_folder       (const std::string & folder);
 int             get_next_job_number (const std::string & task_path);
 std::string     decode_url          (const std::string & url);
-std::string     escape_filename     (const std::string & filename);
+std::string     decode_param        (const std::string & param);
+std::string     enquote_filename     (const std::string & filename);
 
 vec_pid_t       children            (pid_t pid);
 void            children            (pid_t pid, vec_pid_t & vec);

@@ -35,7 +35,8 @@
 				</template>
 				<template v-slot:label="{ item }">
 					<div v-if="item.type === 'task'" @click.stop="go(item)">
-						{{ item.name }}
+						<div>{{ item.name }}</div>
+						<div class="task_desc" v-if="item.conf !== null">{{ item.conf.description }}</div>
 					</div>
 					<div v-else>{{ item.name }}</div>
 				</template>
@@ -160,5 +161,8 @@ export default {
 .info_duration {
 	margin-right: 10px;
 	color: gray;
+}
+.task_desc {
+	color:darkgrey;
 }
 </style>

@@ -10,6 +10,7 @@ namespace glo
 int port = 18080;
 int kill_signal = SIGTERM;
 
+std::string bindaddr;
 std::string title;
 std::string storage;
 std::string default_tasks;

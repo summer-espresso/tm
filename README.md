@@ -47,6 +47,9 @@ DAEMON_GROUP=
 # Custom title of the application
 # APP_TITLE=
 
+# Custom binding address
+# APP_BIND=127.0.0.1
+
 # Custom http port
 # APP_PORT=18080
 
@@ -79,10 +82,24 @@ You can copy the [Example](./doc/Example) directory inside `/var/lib/tm/tasks` a
 
 ## API
 
-You can start a task with the given URL with the 3 vertical dots button
+* Start a task without parameters
+
+You can start a task (without parameters) with the given URL with the 3 vertical dots button :
 
 ```sh
-curl http://localhost:18080/api/task/by_path/%2FExample%2FGet%20some%20informations/execute
+curl 'http://localhost:18080/api/task/by_path/%2FExample%2FGet%20some%20informations/execute'
+```
+
+* Start a task with parameters
+
+You can also start a task with (or without) parameters (up to 50 paramaters) with the same url but adding parameters p1 to p50 : The first parameter must be preceeded by `?`. From the second parameter, the parameter must be preceeded by `&`
+
+**Don't forget to enquote the url with `'` or `"` because of the `&` character from the second parameter.**
+
+In the following example, the first parameter `p1` has the value `value1` and the second parameter `p2` has the value `value2`. These parameters (only the values) will be passed to the script in the order p1 to p50. The parameters must start from p1 and be continuous.
+
+```sh
+curl 'http://localhost:18080/api/task/by_path/%2FExample%2FGet%20some%20informations/execute?p1=value1&p2=value2'
 ```
 
 ## Task configuration
@@ -97,6 +114,16 @@ The `-1` value (default) disable the automatic purge.
 ```json
 {
   "max_log_jobs": 4
+}
+```
+
+* description
+
+A simple text to describe the task.
+
+```json
+{
+  "description": "This is a simple description"
 }
 ```
 

@@ -67,6 +67,10 @@ do_start()
 		EXEC_GROUP="-g $DAEMON_GROUP"
 	fi
 
+	if [ "$APP_BIND" != "" ] ; then
+		DAEMON_ARGS="$DAEMON_ARGS -b $APP_BIND"
+	fi
+
 	if [ "$APP_PORT" != "" ] ; then
 		DAEMON_ARGS="$DAEMON_ARGS -p $APP_PORT"
 	fi

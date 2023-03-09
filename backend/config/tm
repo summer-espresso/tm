@@ -10,6 +10,9 @@ DAEMON_GROUP=
 # Custom title of the application
 # APP_TITLE=
 
+# Custom binding address
+# APP_BIND=127.0.0.1
+
 # Custom http port
 # APP_PORT=18080
 

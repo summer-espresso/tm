@@ -10,6 +10,7 @@ namespace glo {
 extern int port;
 extern int kill_signal;
 
+extern std::string bindaddr;
 extern std::string title;
 extern std::string storage;
 extern std::string default_tasks;

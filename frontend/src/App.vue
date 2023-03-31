@@ -4,7 +4,7 @@
 			<v-list-item>
 				<v-list-item-content>
 					<v-list-item-title class="text-h6"> Task Manager </v-list-item-title>
-					<v-list-item-subtitle> 0.3.5 </v-list-item-subtitle>
+					<v-list-item-subtitle> 0.4.0 </v-list-item-subtitle>
 				</v-list-item-content>
 			</v-list-item>
 
@@ -42,7 +42,13 @@ import { EventBus } from "@/event-bus";
 export default {
 	data: () => ({
 		drawer: false,
-		items: [{ title: "Tasks", icon: "mdi-play-speed", path: "/" }],
+		items: [{
+			title: "Tasks", icon: "mdi-play-speed", path: "/"
+		}, {
+			title: "Fifos", icon: "mdi-ray-start-arrow", path: "/fifo"
+		}, {
+			title: "States", icon: "mdi-database", path: "/state"
+		}],
 		right: null,
 	}),
 	methods: {
@@ -78,33 +84,39 @@ export default {
 
 			this.$store.state.ws.onmessage = (e) => {
 				// console.log("ws onmessage", e);
-				const PREFIX_LEN = 5;
-				const len = e.data.length;
-				if (len > PREFIX_LEN) {
-					const prefix = e.data.substr(0, PREFIX_LEN);
-					const payload = e.data.substr(PREFIX_LEN);
-					if (prefix === "data:") {
-						switch (this.$store.state.current_view) {
-							case "JobView":
-								// payload = data
-								EventBus.$emit("job:data", payload);
-								break;
-						}
-					}
-					if (prefix === "stop:") {
-						// payload = task_path
-						EventBus.$emit("job:stop", payload);
-					}
-					if (prefix === "strt:") {
-						// payload = task_path
-						EventBus.$emit("job:start", payload);
-					}
-					if (prefix === "titl:") {
-						// payload = title
-						EventBus.$emit("app:title", payload);
-					}
+				const sep = e.data.indexOf('|')
+				if (sep < 0) {
+					return;
 				}
-			};
+
+				const prefix = e.data.substr(0, sep);
+				const payload = e.data.substr(sep + 1);
+
+				switch (prefix)
+				{
+					case "job:data":
+						if (this.$store.state.current_view !== "JobView") {
+							return;
+						}
+						break;
+
+					case "state:store":
+					case "state:delete":
+						if (this.$store.state.current_view !== "StateList" && this.$store.state.current_view !== "StateView") {
+							return;
+						}
+						break;
+
+					case "fifo:push":
+					case "fifo:pull":
+						if (this.$store.state.current_view !== "FifoList") {
+							return;
+						}
+						break;
+				}
+
+				EventBus.$emit(prefix, payload);
+			}
 		},
 		change_title(title) {
 			document.title = title;

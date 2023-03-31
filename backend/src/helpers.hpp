@@ -22,6 +22,8 @@ enum class file_type_t
     ERROR,
 };
 
+bool            check_name          (const std::string value);
+std::string     check_topic         (const std::string & topic);
 Json::Value     decode_json         (const std::string value);
 Json::Value     load_json           (const std::string filename);
 void            save_json           (const std::string filename, Json::Value & node);

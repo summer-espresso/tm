@@ -1,6 +1,8 @@
+#include "fifos.hpp"
 #include "executor.hpp"
 #include "globals.hpp"
 #include "helpers.hpp"
+#include "states.hpp"
 #include "task_manager.hpp"
 
 #include <crow.h>
@@ -71,7 +73,7 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 				return;
 			}
 
-			text = "data:";
+			text = "job:data|";
 			for (int i = last_pos ; i < max_pos ; i++)
 			{
 				text += (*log_cache)[i];
@@ -228,8 +230,15 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	glo::default_jobs = glo::storage + "/jobs";
-	glo::default_tasks = glo::storage + "/tasks";
+	glo::default_fifos  = glo::storage + "/fifos";
+	glo::default_jobs   = glo::storage + "/jobs";
+	glo::default_states = glo::storage + "/states";
+	glo::default_tasks  = glo::storage + "/tasks";
+
+	ensure_folder(glo::default_fifos);
+	ensure_folder(glo::default_jobs);
+	ensure_folder(glo::default_states);
+	ensure_folder(glo::default_tasks);
 
 	// https://curl.se/libcurl/c/threadsafe.html
 	curl = curl_easy_init();
@@ -239,32 +248,29 @@ int main(int argc, char* argv[])
 
 	auto& cors = app.get_middleware<crow::CORSHandler>();
 	cors
-	.global()
-	.headers("Access-Control-Allow-Origin", "*")
-	;
-
-	ensure_folder(glo::default_tasks);
-	ensure_folder(glo::default_jobs);
+		.global()
+		.headers("Access-Control-Allow-Origin", "*")
+		;
 
 	task_manager_t task_manager;
 
 	CROW_ROUTE(app, "/web/")
-	([]()
-	{
-		return load_content("web/index.html");
-	});
+	([](const crow::request&, crow::response& res) {
+        res.set_static_file_info("web/index.html");
+        res.end();
+    });
 
 	CROW_ROUTE(app, "/web/<string>")
-	([](const std::string & path)
-	{
-		return load_content(std::string("web/") + path);
-	});
+	([](const crow::request&, crow::response& res, const std::string & path) {
+        res.set_static_file_info("web/" + path);
+        res.end();
+    });
 
 	CROW_ROUTE(app, "/web/<string>/<string>")
-	([](const std::string & path, const std::string & filename)
-	{
-		return load_content("web/" + path + "/" + filename);
-	});
+	([](const crow::request&, crow::response& res, const std::string & path, const std::string & filename) {
+        res.set_static_file_info("web/" + path + "/" + filename);
+        res.end();
+    });
 
 	CROW_ROUTE(app, "/api/task/by_path/<string>/jobs")
 	([](const std::string & task_path_encoded)
@@ -308,7 +314,7 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				broadcast_all((std::string("strt:") + task_path).c_str());
+				broadcast_all((std::string("job:start|") + task_path).c_str());
 				response = "{ \"status\": \"ok\", \"job\": " + std::to_string(res) +  "}";
 			}
 		}
@@ -361,7 +367,7 @@ int main(int argc, char* argv[])
 		std::string task_path = decode_url(task_path_encoded);
 		Json::Value status = task_manager.stop(task_path);
 		map_ws.erase(task_path);
-		broadcast_all("stop:");
+		broadcast_all("job:stop|");
 		std::ostringstream txt;
 		txt << status;
 		return txt.str();
@@ -377,12 +383,52 @@ int main(int argc, char* argv[])
 		return txt.str();
 	});
 
+	CROW_ROUTE(app, "/api/fifo/list")
+	([]() {
+		return list_fifo();
+    });
+
+	CROW_ROUTE(app, "/api/fifo/push/<string>")
+		.methods("POST"_method)([](const crow::request& req, const std::string & topic) {
+			return push_fifo(topic, req.body);
+		});
+
+	CROW_ROUTE(app, "/api/fifo/pull/<string>")
+	([](const std::string & topic) {
+		return pull_fifo(topic);
+    });
+
+	CROW_ROUTE(app, "/api/fifo/delete/<string>")
+	([](const std::string & topic) {
+		return delete_fifo(topic);
+	});
+
+	CROW_ROUTE(app, "/api/state/list")
+	([]() {
+		return list_state();
+    });
+
+	CROW_ROUTE(app, "/api/state/store/<string>")
+		.methods("POST"_method)([](const crow::request& req, const std::string & topic) {
+			return store_state(topic, req.body);
+		});
+
+	CROW_ROUTE(app, "/api/state/read/<string>")
+	([](const std::string & topic) {
+		return read_state(topic);
+    });
+
+	CROW_ROUTE(app, "/api/state/delete/<string>")
+	([](const std::string & topic) {
+		return delete_state(topic);
+    });
+
 	CROW_WEBSOCKET_ROUTE(app, "/ws")
 	.onopen([&task_manager](crow::websocket::connection & conn)
 	{
 		std::lock_guard<std::mutex> _(map_ws_mutex);
 		CROW_LOG_INFO << "websocket open " << &conn;
-		conn.send_text("titl:" + glo::title);
+		conn.send_text("app:title|" + glo::title);
 		int pipe_fd[2];
 		if (pipe(pipe_fd) == 0)
 		{
@@ -454,4 +500,3 @@ int main(int argc, char* argv[])
 	}
 	return 0;
 }
-

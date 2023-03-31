@@ -2,7 +2,10 @@
 
 tm is a simple task manager. It's a rewrite of [Workr](https://github.com/sirikon/workr) with C++ in backend and VueJS 2 in frontend and with some [differencies](./doc/Workr.md).
 
-Don't expect extensive maintenance on this project as it meets almost all my needs (an open source project does not mean [free work](https://raccoon.onyxbits.de/blog/bugreport-free-support/) or [open governance](https://words.werd.io/open-source-does-not-mean-open-governance-8ab751136106)).
+Don't expect extensive maintenance on this project as it meets almost all my needs. An open source project is not :
+* [free work](https://raccoon.onyxbits.de/blog/bugreport-free-support/)
+* [open governance](https://words.werd.io/open-source-does-not-mean-open-governance-8ab751136106)
+* [about you](https://gist.github.com/richhickey/1563cddea1002958f96e7ba9519972d9)
 
 Tasks are just runnable scripts in plain text.
 
@@ -125,6 +128,64 @@ A simple text to describe the task.
 {
   "description": "This is a simple description"
 }
+```
+
+## Fifo
+
+Fifo means First In First Out. Fifo is a trivial queue in order to send a json paylod from one sender to one receiver. One the receiver received the payload, the payload is deleted.
+
+* Send a json payload to a fifo
+
+The payload must be send via the body with a POST request. The fifo name can contain only ascii letters, numbers and underscore characters `_`.
+
+```sh
+# The fifo name is : this_is_a_fifo_test
+curl -H POST http://localhost:18080/api/fifo/push/this_is_a_fifo_test -d '{ "desc": "test" }'
+```
+
+* Retreive the json payload from a fifo
+
+```sh
+# The fifo name is : this_is_a_fifo_test
+curl http://localhost:18080/api/fifo/pull/this_is_a_fifo_test
+```
+
+* Delete a fifo
+
+All existing payload (not retrieved) will be deleted.
+
+```sh
+# The fifo name is : this_is_a_fifo_test
+curl http://localhost:18080/api/fifo/delete/this_is_a_fifo_test
+```
+
+## State
+
+A state is just a text payload which is persisted.
+
+* Store a text payload
+
+The payload must be send via the body with a POST request. The state name can contain only ascii letters, numbers and underscore characters `_`.
+
+The state is persistent until it is explicitly destroyed.
+
+```sh
+# The state name is : this_is_a_state_test
+curl -H POST http://localhost:18080/api/state/store/this_is_a_state_test -d '{ "desc": "test" }'
+```
+
+* Read the text payload from a state
+
+```sh
+# The state name is : this_is_a_state_test
+curl http://localhost:18080/api/state/read/this_is_a_state_test
+```
+
+* Delete a state
+
+```sh
+# The state name is : this_is_a_state_test
+curl http://localhost:18080/api/state/delete/this_is_a_state_test
 ```
 
 ## Build from source

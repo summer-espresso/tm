@@ -13,8 +13,8 @@ extern int kill_signal;
 extern std::string bindaddr;
 extern std::string title;
 extern std::string storage;
-extern std::string default_tasks;
 extern std::string default_jobs;
+extern std::string default_tasks;
 
 extern const size_t PREFIX_LEN;
 extern const char * PREFIX_CLIENT_CLOSE;
@@ -22,5 +22,7 @@ extern const char * PREFIX_SUBSCRIBE;
 extern const char * PREFIX_UNSUBSCRIBE;
 
 }; // glo
+
+#define MAX_LEN_TOPIC_NAME 64
 
 #endif // GLOBALS_HPP

@@ -13,8 +13,8 @@ int kill_signal = SIGTERM;
 std::string bindaddr;
 std::string title;
 std::string storage;
-std::string default_tasks;
 std::string default_jobs;
+std::string default_tasks;
 
 // Longueur fixe de 12 caractères     |------------|
 const size_t PREFIX_LEN      		= 12;

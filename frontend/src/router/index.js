@@ -11,6 +11,21 @@ const routes = [
 		component: TasksList
 	},
 	{
+		path: '/fifo',
+		name: 'fifos',
+		component: () => import(/* webpackChunkName: "settings" */ '../views/FifosList.vue')
+	},
+	{
+		path: '/state',
+		name: 'states',
+		component: () => import(/* webpackChunkName: "settings" */ '../views/StatesList.vue')
+	},
+	{
+		path: '/state/:path/view',
+		name: 'view_state',
+		component: () => import(/* webpackChunkName: "settings" */ '../views/StateView.vue')
+	},
+	{
 		// :path must be url encoded
 		path: '/task/:path/view',
 		name: 'view_task',

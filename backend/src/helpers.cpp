@@ -9,6 +9,7 @@
 #include <mutex>
 #include <vector>
 
+#include <ctype.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -269,7 +270,11 @@ std::string load_content(const std::string filename)
 {
 	// https://github.com/CrowCpp/Crow/blob/4a6d5fe74c05d87ba8742a90666dce565848fbe3/tests/template/mustachetest.cpp
 	std::ifstream is(filename);
-	return { std::istreambuf_iterator<char> (is), std::istreambuf_iterator<char>() };
+	if (is.is_open())
+	{
+		return { std::istreambuf_iterator<char> (is), std::istreambuf_iterator<char>() };
+	}
+	return "";
 }
 
 bool dir_exists(const std::string & folder)
@@ -384,3 +389,25 @@ vec_pid_t diff_children(const std::string & task_path)
 
 	return diff_list;
 }
+
+bool check_name(const std::string value)
+{
+	for (int c : value)
+	{
+		if (!isalnum(c) && (c != '_'))
+			return false;
+	}
+	return true;
+}
+
+std::string check_topic(const std::string & topic)
+{
+	if (topic.length() > MAX_LEN_TOPIC_NAME)
+		return "topic name too long : " + std::to_string(MAX_LEN_TOPIC_NAME) + " max";
+
+	if (!check_name(topic))
+		return "only ascii characters and underscores are valid for a topic name";
+
+	return "";
+}
+

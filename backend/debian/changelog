@@ -1,3 +1,12 @@
+tm (0.4.0-1) stable; urgency=low
+
+  * Add task description
+  * Add task parameters (GET)
+  * Add Fifo and State (Api + Front)
+  * Crow 215834f8f9d0f50795ed92c5d255410053f30096 2023-03-30
+
+ -- Summer Espresso <summer-espresso@dev.null>  Sat, 01 Apr 2023 10:32:53 +0200
+
 tm (0.3.5-1) stable; urgency=low
 
   * Add task description (file task.json)

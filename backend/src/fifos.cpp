@@ -146,12 +146,36 @@ std::string pull_fifo(const std::string & topic)
 		RETURN_RESULT;
 	}
 
+	if ((num_next - num_last + 1) > MAX_NB_FILE)
+	{
+		res["status"] = "error";
+		res["error"] = "maximum number of files reached (" + std::to_string(MAX_NB_FILE) + ")";
+		RETURN_RESULT;
+	}
+
 	num_last++;
 
 	std::string fifo_path;
 
 	for (fifo_path = topic_path + "/" + std::to_string(num_last) + ".json" ; !file_exists(fifo_path) && (num_last < num_next); num_last++)
 		;
+
+	if ((num_last + 1) >= num_next)
+	{
+		num_last = -1;
+		num_next = 0;
+		std::ofstream ofs (topic_path_next);
+		if (ofs.is_open())
+		{
+			ofs << num_next;
+			ofs.close();
+		}
+		else
+		{
+			res["status"] = "error";
+			res["error"] = "unable to open file " + topic_path_next + " for writing";
+		}
+	}
 
 	std::ofstream ofs (topic_path_last);
 	if (ofs.is_open())
@@ -167,7 +191,7 @@ std::string pull_fifo(const std::string & topic)
 	else
 	{
 		res["status"] = "error";
-		res["error"] = "unable to open file " + fifo_path + " for writing";
+		res["error"] = "unable to open file " + topic_path_last + " for writing";
 	}
 
 	RETURN_RESULT;

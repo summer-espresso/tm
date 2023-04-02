@@ -24,5 +24,6 @@ extern const char * PREFIX_UNSUBSCRIBE;
 }; // glo
 
 #define MAX_LEN_TOPIC_NAME 64
+#define MAX_NB_FILE 1000000
 
 #endif // GLOBALS_HPP

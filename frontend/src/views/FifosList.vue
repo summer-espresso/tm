@@ -37,8 +37,7 @@
 				</template>
 				<template v-slot:append="{ item }">
 					<v-row>
-						<div class="info_job">last : {{ item.last }}</div>
-						<div class="info_job">next : {{ item.next }}</div>
+						<div class="info_job">queue size : {{ parseInt(item.next !== '' ? item.next : '0', 10) - parseInt(item.last !== '' ? item.last : '-1', 10) - 1 }}</div>
 					</v-row>
 				</template>
 			</v-treeview>

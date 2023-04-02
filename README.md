@@ -132,7 +132,7 @@ A simple text to describe the task.
 
 ## Fifo
 
-Fifo means First In First Out. Fifo is a trivial queue in order to send a json paylod from one sender to one receiver. One the receiver received the payload, the payload is deleted.
+Fifo means First In First Out. Fifo is a trivial queue in order to send a json payload from one sender to one receiver. One the receiver received the payload, the payload is deleted. The queue is limited to 100000 files.
 
 * Send a json payload to a fifo
 

@@ -255,21 +255,21 @@ int main(int argc, char* argv[])
 	task_manager_t task_manager;
 
 	CROW_ROUTE(app, "/web/")
-	([](const crow::request&, crow::response& res) {
-        res.set_static_file_info("web/index.html");
-        res.end();
+	([]()
+	{
+		return load_content("web/index.html");
     });
 
 	CROW_ROUTE(app, "/web/<string>")
-	([](const crow::request&, crow::response& res, const std::string & path) {
-        res.set_static_file_info("web/" + path);
-        res.end();
+	([](const std::string & path)
+	{
+		return load_content("web/" + path);
     });
 
 	CROW_ROUTE(app, "/web/<string>/<string>")
-	([](const crow::request&, crow::response& res, const std::string & path, const std::string & filename) {
-        res.set_static_file_info("web/" + path + "/" + filename);
-        res.end();
+	([](const std::string & path, const std::string & filename)
+	{
+		return load_content("web/" + path + "/" + filename);
     });
 
 	CROW_ROUTE(app, "/api/task/by_path/<string>/jobs")

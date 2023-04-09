@@ -31,7 +31,7 @@ private:
     map_pid_t   map_pid;
 
 public:
-    int         start       (const std::string & task_path, const std::string & param_list);
+    int         start       (const std::string task_path, const std::string param_list);
     Json::Value stop        (const std::string & task_path);
     void        signal_end  (const std::string & task_path, int exit_code);
     std::shared_ptr<vec_str_t> set_log     (const std::string task_path);

@@ -15,7 +15,7 @@ std::mutex tm_mutex;
 
 // https://programmer.group/c-std-condition_variable-wait-wait_for-is-different-from-how-to-use-instances.html
 
-int task_manager_t::start(const std::string & task_path, const std::string & param_list)
+int task_manager_t::start(const std::string task_path, const std::string param_list)
 {
 	const std::lock_guard<std::mutex> lock(tm_mutex);
 	if (running_tasks.find(task_path) != running_tasks.end())

@@ -60,9 +60,9 @@ void purge_log(const std::string log_base, int max_log_jobs)
 
 const std::string execute_task(
 	task_manager_t * task_manager,
-	const std::string & task_path,
+	const std::string task_path,
 	int job_number,
-	const std::string & param_list
+	const std::string param_list
 )
 {
 	std::string result;

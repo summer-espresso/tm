@@ -12,6 +12,7 @@
 #include <time.h>
 
 std::mutex tm_mutex;
+std::mutex map_mutex;
 
 // https://programmer.group/c-std-condition_variable-wait-wait_for-is-different-from-how-to-use-instances.html
 
@@ -107,7 +108,7 @@ void task_manager_t::signal_end(const std::string & task_path, int exit_code)
 
 std::shared_ptr<vec_str_t> task_manager_t::set_log(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	auto log_cache = std::make_shared<vec_str_t>();
 	map_log[task_path] = log_cache;
 	auto cv = std::make_shared<std::condition_variable>();
@@ -121,31 +122,31 @@ std::shared_ptr<vec_str_t> task_manager_t::set_log(const std::string task_path)
 
 const std::shared_ptr<int> task_manager_t::get_cpt(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	return map_cpt.find(task_path) != map_cpt.end() ? map_cpt[task_path] : nullptr;
 }
 
 const std::shared_ptr<vec_str_t> task_manager_t::get_log(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	return map_log.find(task_path) != map_log.end() ? map_log[task_path] : nullptr;
 }
 
 const std::shared_ptr<std::condition_variable> task_manager_t::get_cov(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	return map_cov.find(task_path) != map_cov.end() ? map_cov[task_path] : nullptr;
 }
 
 const std::shared_ptr<std::mutex> task_manager_t::get_mtx(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	return map_mtx.find(task_path) != map_mtx.end() ? map_mtx[task_path] : nullptr;
 }
 
 void task_manager_t::del_log(const std::string task_path)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	map_cpt.erase(task_path);
 	map_log.erase(task_path);
 	map_cov.erase(task_path);
@@ -154,6 +155,6 @@ void task_manager_t::del_log(const std::string task_path)
 
 void task_manager_t::set_pid(const std::string& task_path, vec_pid_t pid_list)
 {
-	const std::lock_guard<std::mutex> lock(tm_mutex);
+	const std::lock_guard<std::mutex> lock(map_mutex);
 	map_pid[task_path] = pid_list;
 }

@@ -4,7 +4,7 @@
 			<v-list-item>
 				<v-list-item-content>
 					<v-list-item-title class="text-h6"> Task Manager </v-list-item-title>
-					<v-list-item-subtitle> 0.4.4 </v-list-item-subtitle>
+					<v-list-item-subtitle> 0.4.5 </v-list-item-subtitle>
 				</v-list-item-content>
 			</v-list-item>
 

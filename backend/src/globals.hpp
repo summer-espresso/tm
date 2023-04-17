@@ -25,5 +25,7 @@ extern const char * PREFIX_UNSUBSCRIBE;
 
 #define MAX_LEN_TOPIC_NAME 64
 #define MAX_NB_FILE 1000000
+#define PIPE_FD_READ 0
+#define PIPE_FD_WRITE 1
 
 #endif // GLOBALS_HPP

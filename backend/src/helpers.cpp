@@ -163,6 +163,7 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 				const std::string filename = ent->d_name;
 				if (filename == "run.sh")
 				{
+					closedir(dir);
 					return file_type_t::TASK;
 				}
 			}
@@ -183,6 +184,8 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 				}
 			}
 		}
+
+		closedir(dir);
 
 		std::sort(element_list.begin(), element_list.end());
 
@@ -221,8 +224,6 @@ file_type_t load_tasks(Json::Value & node, const std::string storage_path, const
 		{
 			node.append(elt);
 		}
-
-		closedir(dir);
 	}
 
 	return file_type_t::FOLDER;
@@ -249,6 +250,8 @@ Json::Value load_jobs(const std::string storage_path)
 			}
 		}
 
+		closedir(dir);
+
 		std::sort(dir_list.rbegin(), dir_list.rend());
 
 		for (int num : dir_list)
@@ -259,8 +262,6 @@ Json::Value load_jobs(const std::string storage_path)
 				node.append(job);
 			}
 		}
-
-		closedir(dir);
 	}
 
 	return node;
@@ -349,6 +350,7 @@ vec_pid_t children(pid_t pid)
 		}
 		freeproc(proc_info);
 	}
+	closeproc(proc);
 	return vec;
 }
 
@@ -363,6 +365,7 @@ void children(pid_t pid, vec_pid_t & vec)
 		}
 		freeproc(proc_info);
 	}
+	closeproc(proc);
 }
 
 vec_pid_t diff_children(const std::string & task_path)

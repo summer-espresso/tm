@@ -147,10 +147,11 @@ const std::shared_ptr<std::mutex> task_manager_t::get_mtx(const std::string task
 void task_manager_t::del_log(const std::string task_path)
 {
 	const std::lock_guard<std::mutex> lock(map_mutex);
-	map_cpt.erase(task_path);
 	map_log.erase(task_path);
+	map_cpt.erase(task_path);
 	map_cov.erase(task_path);
 	map_mtx.erase(task_path);
+	map_pid.erase(task_path);
 }
 
 void task_manager_t::set_pid(const std::string& task_path, vec_pid_t pid_list)

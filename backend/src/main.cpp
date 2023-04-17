@@ -23,14 +23,21 @@ using map_ws_t = std::map<std::string, std::map<crow::websocket::connection *, i
 using map_active_ws_t = std::map<crow::websocket::connection *, int>;
 using map_ws_current_task_t = std::map<crow::websocket::connection *, size_t>;
 
-map_active_ws_t map_active_ws;
-map_ws_current_task_t map_ws_current_task;
-map_ws_t map_ws;
-std::mutex map_ws_mutex;
+map_active_ws_t 		map_ws_read_pipe;
+std::mutex				map_ws_read_pipe_mutex;
+
+map_active_ws_t 		map_ws_write_pipe;
+std::mutex				map_ws_write_pipe_mutex;
+
+map_ws_current_task_t 	map_ws_current_task;
+std::mutex				map_ws_current_task_mutex;
+
+map_ws_t				map_ws_subscribe;
+std::mutex				map_ws_subscribe_mutex;
 
 void broadcast_all(const char * buf)
 {
-	for (auto & v : map_active_ws)
+	for (auto & v : map_ws_write_pipe)
 	{
 		v.first->send_text(buf);
 	}
@@ -38,7 +45,7 @@ void broadcast_all(const char * buf)
 
 void broadcast_others(const char * buf, crow::websocket::connection * self_conn)
 {
-	for (auto & v : map_active_ws)
+	for (auto & v : map_ws_write_pipe)
 	{
 		if (v.first != self_conn)
 		{
@@ -79,17 +86,17 @@ void send_output_stream(task_manager_t * task_manager, crow::websocket::connecti
 				text += (*log_cache)[i];
 			}
 
-			if (map_active_ws.find(conn) != map_active_ws.end())
+			if (map_ws_write_pipe.find(conn) != map_ws_write_pipe.end())
 			{
-				if (map_ws[task_path].find(conn) != map_ws[task_path].end())
+				if (map_ws_subscribe[task_path].find(conn) != map_ws_subscribe[task_path].end())
 				{
 					conn->send_text(text);
 				}
 			}
 			else
 			{
-				std::lock_guard<std::mutex> lck(map_ws_mutex);
-				map_ws[task_path].erase(conn);
+				std::lock_guard<std::mutex> lck(map_ws_subscribe_mutex);
+				map_ws_subscribe[task_path].erase(conn);
 				return;
 			}
 
@@ -122,14 +129,20 @@ void client_manager(task_manager_t * task_manager, crow::websocket::connection *
 			else if (prefix == glo::PREFIX_SUBSCRIBE)
 			{
 				std::thread th = std::thread(send_output_stream, task_manager, conn, data);
+				std::lock_guard<std::mutex> _(map_ws_current_task_mutex);
 				map_ws_current_task[conn] = th.native_handle();
 				th.detach();
 			}
 			else if (prefix == glo::PREFIX_UNSUBSCRIBE)
 			{
+				std::lock_guard<std::mutex> _(map_ws_current_task_mutex);
 				map_ws_current_task.erase(conn);
 			}
 		}
+	}
+	if (close(read_fd) < 0)
+	{
+		CROW_LOG_WARNING << "error (internal) close read pipe";
 	}
 }
 
@@ -366,7 +379,7 @@ int main(int argc, char* argv[])
 	{
 		std::string task_path = decode_url(task_path_encoded);
 		Json::Value status = task_manager.stop(task_path);
-		map_ws.erase(task_path);
+		// map_ws_subscribe.erase(task_path);
 		broadcast_all("job:stop|");
 		std::ostringstream txt;
 		txt << status;
@@ -426,14 +439,15 @@ int main(int argc, char* argv[])
 	CROW_WEBSOCKET_ROUTE(app, "/ws")
 	.onopen([&task_manager](crow::websocket::connection & conn)
 	{
-		std::lock_guard<std::mutex> _(map_ws_mutex);
 		CROW_LOG_INFO << "websocket open " << &conn;
 		conn.send_text("app:title|" + glo::title);
 		int pipe_fd[2];
 		if (pipe(pipe_fd) == 0)
 		{
-			map_active_ws[&conn] = pipe_fd[1];
-			std::thread th = std::thread(client_manager, &task_manager, &conn, pipe_fd[0]);
+			std::lock_guard<std::mutex> _(map_ws_write_pipe_mutex);
+			map_ws_read_pipe[&conn] = pipe_fd[PIPE_FD_READ];
+			map_ws_write_pipe[&conn] = pipe_fd[PIPE_FD_WRITE];
+			std::thread th = std::thread(client_manager, &task_manager, &conn, pipe_fd[PIPE_FD_READ]);
 			th.detach();
 		}
 		else
@@ -443,20 +457,25 @@ int main(int argc, char* argv[])
 	})
 	.onclose([](crow::websocket::connection & conn, const std::string & reason)
 	{
-		std::lock_guard<std::mutex> _(map_ws_mutex);
+		std::lock_guard<std::mutex> _(map_ws_write_pipe_mutex);
 		CROW_LOG_INFO << "websocket close " << &conn;
-		if (map_active_ws.find(&conn) != map_active_ws.end())
+		if (map_ws_write_pipe.find(&conn) != map_ws_write_pipe.end())
 		{
-			if (write(map_active_ws[&conn], glo::PREFIX_CLIENT_CLOSE, glo::PREFIX_LEN) < 0)
+			if (write(map_ws_write_pipe[&conn], glo::PREFIX_CLIENT_CLOSE, glo::PREFIX_LEN) < 0)
 			{
 				CROW_LOG_WARNING << "error (internal) send closing message";
 			}
-			map_active_ws.erase(&conn);
+			if (close(map_ws_write_pipe[&conn]) < 0)
+			{
+				CROW_LOG_WARNING << "error (internal) close write pipe";
+			}
+			map_ws_read_pipe.erase(&conn);
+			map_ws_write_pipe.erase(&conn);
 		}
 	})
 	.onmessage([&task_manager](crow::websocket::connection & conn, const std::string & data, bool is_binary)
 	{
-		std::lock_guard<std::mutex> _(map_ws_mutex);
+		std::lock_guard<std::mutex> _(map_ws_subscribe_mutex);
 		if (!is_binary)
 		{
 			Json::Value msg = decode_json(data);
@@ -464,8 +483,8 @@ int main(int argc, char* argv[])
 			{
 				const std::string task_path = msg["task"].asString().c_str();
 				const std::string msg = glo::PREFIX_SUBSCRIBE + task_path;
-				map_ws[task_path][&conn] = 1;
-				if (write(map_active_ws[&conn], msg.c_str(), msg.size()) < 0)
+				map_ws_subscribe[task_path][&conn] = 1;
+				if (write(map_ws_write_pipe[&conn], msg.c_str(), msg.size()) < 0)
 				{
 					CROW_LOG_ERROR << "error (internal) send subscribe message";
 				}
@@ -474,8 +493,8 @@ int main(int argc, char* argv[])
 			{
 				const std::string task_path = msg["task"].asString().c_str();
 				const std::string msg = glo::PREFIX_UNSUBSCRIBE + task_path;
-				map_ws[task_path].erase(&conn);
-				if (write(map_active_ws[&conn], msg.c_str(), msg.size()) < 0)
+				map_ws_subscribe[task_path].erase(&conn);
+				if (write(map_ws_write_pipe[&conn], msg.c_str(), msg.size()) < 0)
 				{
 					CROW_LOG_ERROR << "error (internal) send unsubscribe message";
 				}

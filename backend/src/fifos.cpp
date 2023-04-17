@@ -232,6 +232,8 @@ std::string list_fifo()
 			}
 		}
 
+		closedir(dir);
+
 		std::sort(dir_list.begin(), dir_list.end());
 
 		Json::Value value;
@@ -243,8 +245,6 @@ std::string list_fifo()
 			value["name"] = d;
 			res.append(value);
 		}
-
-		closedir(dir);
 	}
 
 	RETURN_RESULT;

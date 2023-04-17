@@ -36,6 +36,8 @@ void purge_log(const std::string log_base, int max_log_jobs)
 			}
 		}
 
+		closedir(dir);
+
 		std::sort(element_list.rbegin(), element_list.rend());
 
 		std::string log_path;
@@ -53,8 +55,6 @@ void purge_log(const std::string log_base, int max_log_jobs)
 			(void) system(cmd.c_str());
 #pragma GCC diagnostic pop
 		}
-
-		closedir(dir);
 	}
 }
 
@@ -124,8 +124,10 @@ const std::string execute_task(
 		}
 		else
 		{
-			exit_code = errno;
+			exit_code = -errno;
+			CROW_LOG_ERROR << "unable to open command " << cmd_path << exit_code;
 		}
+
 		ofs.close();
 
 		const std::string cmd = "ansi2html -n < " + enquote_filename(log_path) + " > " + enquote_filename(log_path + ".html");

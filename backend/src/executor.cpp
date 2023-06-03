@@ -150,7 +150,7 @@ const std::string execute_task(
 
 	task_manager->del_log(task_path);
 	task_manager->signal_end(task_path, exit_code);
-	broadcast_all((std::string("job:stop|") + task_path).c_str());
+	broadcast_all((std::string("job:stop|") + std::to_string(job_number) + "|" + task_path).c_str());
 
 	return result;
 }

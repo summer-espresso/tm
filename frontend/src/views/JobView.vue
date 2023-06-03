@@ -167,7 +167,19 @@ export default {
 			}
 		},
 		job_stop(task_path) {
-			console.log("JobView : job_stop", task_path, this.$route.params.path);
+
+			const sep = task_path.indexOf('|')
+			if (sep < 0) {
+				return;
+			}
+
+			const job_number = task_path.substr(0, sep);
+			if (this.$route.params.job !== job_number) {
+				return;
+			}
+
+			task_path = task_path.substr(sep + 1);
+
 			if (task_path === this.$route.params.path) {
 				this.is_running = false;
 				this.fetch_status();
@@ -192,8 +204,20 @@ export default {
 				document.documentElement.scrollTop = document.body.scrollHeight;
 			}
 		},
-		job_clear(task_path) {
-			console.log("JobView : job_clear", task_path, this.$route.params.path);
+		job_start(task_path) {
+
+			const sep = task_path.indexOf('|')
+			if (sep < 0) {
+				return;
+			}
+
+			const job_number = task_path.substr(0, sep);
+			if (this.$route.params.job !== job_number) {
+				return;
+			}
+
+			task_path = task_path.substr(sep + 1);
+
 			if (task_path === this.$route.params.path) {
 				this.output = "";
 				this.html_content = "";
@@ -204,7 +228,7 @@ export default {
 		this.listen_events();
 		EventBus.$on("job:stop", this.job_stop);
 		EventBus.$on("job:data", this.job_data);
-		EventBus.$on("job:start", this.job_clear);
+		EventBus.$on("job:start", this.job_start);
 	},
 	async activated() {
 		const output_el = document.getElementById("job_execution_output");

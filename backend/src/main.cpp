@@ -320,15 +320,15 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
-			int res = task_manager.start(task_path, param_list);
-			if (res < 0)
+			int job_number = task_manager.start(task_path, param_list);
+			if (job_number < 0)
 			{
-				response = "{ \"status\": \"error\", \"errnum\": " + std::to_string(-res) +  "}";
+				response = "{ \"status\": \"error\", \"errnum\": " + std::to_string(-job_number) +  "}";
 			}
 			else
 			{
-				broadcast_all((std::string("job:start|") + task_path).c_str());
-				response = "{ \"status\": \"ok\", \"job\": " + std::to_string(res) +  "}";
+				broadcast_all((std::string("job:start|") + std::to_string(job_number) + "|" + task_path).c_str());
+				response = "{ \"status\": \"ok\", \"job\": " + std::to_string(job_number) +  "}";
 			}
 		}
 		return response;

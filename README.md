@@ -2,6 +2,8 @@
 
 tm is a simple task manager. It's a rewrite of [Workr](https://github.com/sirikon/workr) with C++ in backend and VueJS 2 in frontend and with some [differencies](./doc/Workr.md).
 
+I added Fifos and States because I found [state management](https://docs.dapr.io/getting-started/quickstarts/statemanagement-quickstart/) and [publish and subscribe](https://docs.dapr.io/getting-started/quickstarts/pubsub-quickstart/) very usefull but Dapr is way to heavy for that task.
+
 Don't expect extensive maintenance on this project as it meets almost all my needs. An open source project is not :
 * [free work](https://raccoon.onyxbits.de/blog/bugreport-free-support/)
 * [open governance](https://words.werd.io/open-source-does-not-mean-open-governance-8ab751136106)

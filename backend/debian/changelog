@@ -1,3 +1,9 @@
+tm (0.4.7-1) stable; urgency=low
+
+  * Fix visual refresh job list (regression)
+
+ -- Summer Espresso <summer-espresso@dev.null>  Sun, 04 Jun 2023 04:06:43 +0200
+
 tm (0.4.6-1) stable; urgency=low
 
   * Fix visual glitch viewing an old job during another job execution

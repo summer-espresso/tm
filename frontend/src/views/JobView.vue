@@ -61,6 +61,7 @@
 
 <script>
 import { EventBus } from "@/event-bus";
+import { tools } from "@/tools";
 
 export default {
 	name: "JobView",
@@ -166,21 +167,12 @@ export default {
 				this.$store.state.ws.send(JSON.stringify(data));
 			}
 		},
-		job_stop(task_path) {
-
-			const sep = task_path.indexOf('|')
-			if (sep < 0) {
+		job_stop(payload) {
+			const task = tools.get_task(payload)
+			if (this.$route.params.job !== task.job_number) {
 				return;
 			}
-
-			const job_number = task_path.substr(0, sep);
-			if (this.$route.params.job !== job_number) {
-				return;
-			}
-
-			task_path = task_path.substr(sep + 1);
-
-			if (task_path === this.$route.params.path) {
+			if (task.task_path === this.$route.params.path) {
 				this.is_running = false;
 				this.fetch_status();
 				this.$nextTick(() => {
@@ -204,21 +196,12 @@ export default {
 				document.documentElement.scrollTop = document.body.scrollHeight;
 			}
 		},
-		job_start(task_path) {
-
-			const sep = task_path.indexOf('|')
-			if (sep < 0) {
+		job_start(payload) {
+			const task = tools.get_task(payload)
+			if (this.$route.params.job !== task.job_number) {
 				return;
 			}
-
-			const job_number = task_path.substr(0, sep);
-			if (this.$route.params.job !== job_number) {
-				return;
-			}
-
-			task_path = task_path.substr(sep + 1);
-
-			if (task_path === this.$route.params.path) {
+			if (task.task_path === this.$route.params.path) {
 				this.output = "";
 				this.html_content = "";
 			}

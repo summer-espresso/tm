@@ -102,6 +102,7 @@
 <script>
 import { DateTime } from "luxon";
 import { EventBus } from "@/event-bus";
+import { tools } from "@/tools";
 
 export default {
 	name: "TaskView",
@@ -185,8 +186,9 @@ export default {
 			const json = await res.json();
 			this.job_list = json;
 		},
-		dispatch_job_event(task_path) {
-			if (task_path === this.$route.params.path) {
+		dispatch_job_event(payload) {
+			const task = tools.get_task(payload)
+			if (task.task_path === this.$route.params.path) {
 				this.fetch_task_jobs();
 			}
 		},

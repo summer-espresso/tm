@@ -23,7 +23,6 @@
 				v-model="selected_node"
 				:open="initiallyOpen"
 				:items="task_list"
-				activatable
 				open-on-click
 				style="width: 100%"
 			>

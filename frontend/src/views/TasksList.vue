@@ -14,6 +14,42 @@
 				</template>
 				<span>Refresh</span>
 			</v-tooltip>
+			<v-menu
+				v-bind:close-on-click="true"
+				v-bind:close-on-content-click="false"
+				offset-y
+			>
+				<template v-slot:activator="{ on: menu, attrs }">
+					<v-tooltip bottom>
+						<template v-slot:activator="{ on: tooltip }">
+							<v-btn
+								outlined
+								color="primary"
+								dark
+								v-bind="attrs"
+								v-on="{ ...tooltip, ...menu }"
+								><v-icon>mdi-refresh-auto</v-icon>
+							</v-btn>
+						</template>
+						<span v-if="autoRefreshValue === 0">Auto-refresh : OFF</span>
+						<span v-if="autoRefreshValue > 0">Auto-refresh : Every {{ autoRefreshValue }} seconds</span>
+					</v-tooltip>
+				</template>
+				<v-list>
+					<v-subheader>Auto-refresh</v-subheader>
+					<v-list-item v-for="(autoRefresh, index) in autoRefreshList" :key="index">
+						<v-list-item-content>
+							<v-btn
+								:outlined="autoRefresh.value !== autoRefreshValue"
+								color="primary"
+								dark
+								@click="set_auto_refresh(autoRefresh.value)"
+								>{{ autoRefresh.title }}
+							</v-btn>
+						</v-list-item-content>
+					</v-list-item>
+				</v-list>
+			</v-menu>
 		</v-row>
 		<v-row>
 			<v-divider></v-divider>
@@ -77,6 +113,39 @@ export default {
 			initiallyOpen: ["/"],
 			selected_node: [],
 			isLoaded: false,
+			timerHandle: null,
+			autoRefreshValue: 0,
+			autoRefreshList: [{
+				title: "OFF",
+				value: 0,
+			}, {
+				title: "Every 1 second",
+				value: 1,
+			}, {
+				title: "Every 5 seconds",
+				value: 5,
+			}, {
+				title: "Every 10 seconds",
+				value: 10,
+			}, {
+				title: "Every 30 seconds",
+				value: 30,
+			}, {
+				title: "Every 1 minute",
+				value: 60,
+			}, {
+				title: "Every 5 minutes",
+				value: 60 * 5,
+			}, {
+				title: "Every 10 minutes",
+				value: 60 * 10,
+			}, {
+				title: "Every 30 minutes",
+				value: 60 * 30,
+			}, {
+				title: "Every 60 minutes",
+				value: 60 * 60,
+			}],
 		};
 	},
 	methods: {
@@ -130,22 +199,45 @@ export default {
 				window.localStorage.setItem("folder_opened", JSON.stringify(folder_opened))
 			}
 		},
+		set_timer() {
+			if (this.timerHandle !== null) {
+				clearInterval(this.timerHandle)
+			}
+			if (this.autoRefreshValue > 0) {
+				this.timerHandle = setInterval(() => {
+					this.fetch_task_list()
+				}, this.autoRefreshValue * 1000)
+			}
+		},
+		set_auto_refresh(auto_refresh) {
+			window.localStorage.setItem("auto_refresh", auto_refresh)
+			this.autoRefreshValue = auto_refresh
+			this.set_timer()
+		},
 		async fetch_task_list() {
 			const res = await fetch(`${this.make_api_url()}/tasks`, {
 				cache: "no-cache",
 			});
 			const json = await res.json();
 			this.task_list = json !== null ? json : [];
-			const folder_opened = window.localStorage.getItem("folder_opened")
-			try {
-				const json_folder_opened = JSON.parse(folder_opened)
-				if (Array.isArray(json_folder_opened)) {
-					this.initiallyOpen = json_folder_opened
+			if (!this.isLoaded) {
+				const folder_opened = window.localStorage.getItem("folder_opened")
+				try {
+					const json_folder_opened = JSON.parse(folder_opened)
+					if (Array.isArray(json_folder_opened)) {
+						this.initiallyOpen = json_folder_opened
+					}
+				} catch (e) {
+					// Nothing
 				}
-			} catch (e) {
-				// Nothing
+				try {
+					this.autoRefreshValue = parseInt(window.localStorage.getItem("auto_refresh"), 10)
+				} catch (e) {
+					// Nothing
+				}
+				this.set_timer()
+				this.isLoaded = true
 			}
-			this.isLoaded = true
 		},
 	},
 	activated() {

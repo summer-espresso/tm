@@ -1,3 +1,12 @@
+tm (0.5.0-1) stable; urgency=low
+
+  * Update package-lock.json
+  * Add persistent auto-refresh
+  * Added persistence for open task folders
+  * Delete activatable (misleading)
+
+ -- Summer Espresso <summer-espresso@dev.null>  Thu, 10 Aug 2023 14:11:07 +0200
+
 tm (0.4.7-1) stable; urgency=low
 
   * Fix visual refresh job list (regression)

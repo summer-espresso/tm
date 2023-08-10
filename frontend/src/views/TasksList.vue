@@ -25,6 +25,7 @@
 				:items="task_list"
 				open-on-click
 				style="width: 100%"
+				@update:open="cache_treeview"
 			>
 				<template v-slot:prepend="{ item, open }">
 					<v-icon v-if="item.type === 'folder'">
@@ -75,6 +76,7 @@ export default {
 			task_list: [{ name: "/" }],
 			initiallyOpen: ["/"],
 			selected_node: [],
+			isLoaded: false,
 		};
 	},
 	methods: {
@@ -123,12 +125,27 @@ export default {
 			);
 			this.$router.push(`/task/${encoded_task}/view`);
 		},
+		cache_treeview(folder_opened) {
+			if (this.isLoaded) {
+				window.localStorage.setItem("folder_opened", JSON.stringify(folder_opened))
+			}
+		},
 		async fetch_task_list() {
 			const res = await fetch(`${this.make_api_url()}/tasks`, {
 				cache: "no-cache",
 			});
 			const json = await res.json();
 			this.task_list = json !== null ? json : [];
+			const folder_opened = window.localStorage.getItem("folder_opened")
+			try {
+				const json_folder_opened = JSON.parse(folder_opened)
+				if (Array.isArray(json_folder_opened)) {
+					this.initiallyOpen = json_folder_opened
+				}
+			} catch (e) {
+				// Nothing
+			}
+			this.isLoaded = true
 		},
 	},
 	activated() {

@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository has been moved to codeberg : https://codeberg.org/SummerEspresso/tm
+
 # tm
 
 tm is a simple task manager. It's a rewrite of [Workr](https://github.com/sirikon/workr) with C++ in backend and VueJS 2 in frontend and with some [differencies](./doc/Workr.md).
